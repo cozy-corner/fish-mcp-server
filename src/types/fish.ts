@@ -13,7 +13,7 @@ export enum HabitatZone {
   UNKNOWN = 'unknown'
 }
 
-// 危険性
+// 危険性（注意: 生データには大文字小文字の不整合があるため、変換時に正規化する）
 export enum DangerLevel {
   HARMLESS = 'harmless',
   VENOMOUS = 'venomous',
