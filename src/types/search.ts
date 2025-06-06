@@ -18,7 +18,7 @@ export interface SearchOptions {
   fresh?: boolean;        // 淡水
   saltwater?: boolean;    // 海水
   brackish?: boolean;     // 汽水
-  habitatZone?: HabitatZone; // 生息域
+  habitatZone?: HabitatZone; // 主要生息域
   
   // 特性
   dangerous?: boolean;    // 危険な魚のみ

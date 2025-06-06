@@ -112,7 +112,7 @@ export interface Fish {
   fresh: boolean;         // 淡水
   brackish: boolean;      // 汽水  
   saltwater: boolean;     // 海水
-  demersPelag?: HabitatZone; // 生息域
+  habitatZone?: HabitatZone; // 主要生息域（底生性/遊泳性）
   
   // サイズ・重量（実際の範囲: 0.8-1700cm, 0.05g-34000kg）
   length?: Centimeters;        // 最大体長
