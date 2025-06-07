@@ -1,17 +1,18 @@
+/* eslint-disable no-unused-vars */
 import { Fish } from './fish.js';
 
 // 対応言語（MVPでは英語と日本語のみ）
 export enum Language {
   ENGLISH = 'English',
-  JAPANESE = 'Japanese'
+  JAPANESE = 'Japanese',
 }
 
 // 1つの魚に対する1つの言語での1つの一般名
 export interface CommonName {
-  autoctr: number;        // ユニークID
-  comName: string;        // 一般名（例: "Kuromaguro", "Atlantic bluefin tuna"）
-  specCode: number;       // 魚のID
-  language: Language;     // 言語（英語または日本語のみ）
+  autoctr: number; // ユニークID
+  comName: string; // 一般名（例: "Kuromaguro", "Atlantic bluefin tuna"）
+  specCode: number; // 魚のID
+  language: Language; // 言語（英語または日本語のみ）
   preferredName: boolean; // この言語での推奨名かどうか
 }
 
@@ -27,6 +28,6 @@ export interface SearchResult {
   fish: Fish;
   englishNames: CommonName[];
   japaneseNames: CommonName[];
-  score?: number;         // 検索スコア（FTS5のrank）
-  highlighted?: string;   // ハイライト表示用
+  score?: number; // 検索スコア（FTS5のrank）
+  highlighted?: string; // ハイライト表示用
 }
