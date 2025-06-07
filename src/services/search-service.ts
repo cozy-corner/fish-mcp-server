@@ -64,7 +64,7 @@ interface CommonNameDbRow {
   com_name: string;
   spec_code: number;
   language: string;
-  preferred: number;
+  preferred_name: number;
 }
 
 export class SearchService {
@@ -225,7 +225,7 @@ export class SearchService {
       comName: row.com_name,
       specCode: row.spec_code,
       language: row.language,
-      preferred: Boolean(row.preferred),
+      preferred: Boolean(row.preferred_name),
     }));
   }
 
