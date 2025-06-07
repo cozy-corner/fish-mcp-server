@@ -3,14 +3,60 @@
 ## Project Overview
 Fish MCP Server - An MCP server for searching fish information in Japanese, using FishBase data with local SQLite + FTS5 for full-text search.
 
+## ⚠️ CRITICAL: PR Review Comment Check (MUST DO FIRST)
+When working on PRs, **ALWAYS execute these two commands FIRST**:
+
+```bash
+# Command 1: Get PR overview
+gh pr view {pr_number} --comments
+
+# Command 2: Get line-by-line comments (CRITICAL - often missed)
+gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
+```
+
+**WARNING**: Skipping Command 2 will cause you to miss important code-level feedback and bugs.
+
+## PR Comment Response Rules
+
+### ✅ CORRECT: Reply to specific comments
+```bash
+# Reply to a specific comment (use the comment ID from API response)
+gh api repos/{owner}/{repo}/pulls/5/comments --method POST \
+  --field body="Your reply message here" \
+  --field in_reply_to={comment_id}
+```
+
+### ❌ WRONG: These commands will EDIT/OVERWRITE existing comments
+```bash
+# DO NOT USE - This edits existing comments (overwrites original)
+gh api repos/{owner}/{repo}/pulls/comments/{comment_id} --method POST --field body="..."
+```
+
+### ❌ WRONG: These commands post to PR body (not specific comments)
+```bash
+# DO NOT USE - This posts to PR body, not as reply to specific comment
+gh pr comment {pr_number} --body="..."
+
+# DO NOT USE - This also posts to PR body, not specific line comments
+gh api repos/{owner}/{repo}/pulls/{pr_number}/comments --method POST --field body="..."
+```
+
+**Problem**: PR body comments don't show relationship to specific code issues and make it unclear which comments have been addressed.
+
+### Response Requirements
+1. **Reply to EVERY comment** (including nitpicks)
+2. **Include commit IDs** for fixes: `Fixed in commit [abc123](link)`
+3. **Mark status clearly**: "Fixed", "Won't implement", "Acknowledged"
+4. **Use in_reply_to** for direct comment replies
+
 ## Important Documentation
-- `/docs/development-workflows.md` - **CRITICAL**: Review oversight prevention procedures. Must read at session start to avoid missing PR review comments.
+- All critical procedures are documented directly in this file
 
 ## Development Guidelines
 When working on this project:
-1. Always read `/docs/development-workflows.md` at session start
-2. Follow the two-command review check process for all PRs
-3. Use `gh pr view --comments` and `gh api` for complete review coverage
+1. **FIRST**: Execute the two PR review commands above
+2. Use TodoWrite tool to track comment responses
+3. Reply to ALL comments (including nitpicks) with clear status
 
 ## Code Quality Rules
 **MANDATORY**: Run linting before any commit:
