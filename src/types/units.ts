@@ -9,8 +9,6 @@ export const g = (value: number): Grams => value as Grams;
 export const m = (value: number): Meters => value as Meters;
 
 // 型安全な変換関数
-export const cmToM = (centimeters: Centimeters): Meters => 
-  m(centimeters / 100);
+export const cmToM = (centimeters: Centimeters): Meters => m(centimeters / 100);
 
-export const gToKg = (grams: Grams): number => 
-  grams / 1000;
+export const gToKg = (grams: Grams): number => grams / 1000;
