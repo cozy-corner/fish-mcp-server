@@ -30,15 +30,19 @@ export class DatabaseManager {
     this.db.pragma('mmap_size = 268435456'); // 256MB
   }
 
-  async initialize(): Promise<void> {
+  initialize(): void {
     if (this.isInitialized) return;
 
     console.log('Initializing database schema...');
 
-    const schemaPath = join(__dirname, 'schema.sql');
-    const schema = readFileSync(schemaPath, 'utf-8');
+    try {
+      const schemaPath = join(__dirname, 'schema.sql');
+      const schema = readFileSync(schemaPath, 'utf-8');
 
-    this.db.exec(schema);
+      this.db.exec(schema);
+    } catch (error) {
+      throw new Error(`Failed to initialize database schema: ${error}`);
+    }
 
     console.log('Database schema initialized successfully');
     this.isInitialized = true;
