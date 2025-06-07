@@ -48,10 +48,6 @@ export class DatabaseManager {
     this.isInitialized = true;
   }
 
-  getDatabase(): Database.Database {
-    return this.db;
-  }
-
   optimizeDatabase(): void {
     console.log('Optimizing database...');
     try {
@@ -97,6 +93,10 @@ export class DatabaseManager {
     } catch (error) {
       throw new Error(`Failed to get database statistics: ${error}`);
     }
+  }
+
+  getDatabase(): Database.Database {
+    return this.db;
   }
 
   close(): void {

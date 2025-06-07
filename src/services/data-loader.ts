@@ -1,4 +1,4 @@
-import { ParquetReader } from 'parquetjs';
+import parquetjs from 'parquetjs';
 import {
   Fish,
   HabitatZone,
@@ -82,7 +82,7 @@ export class FishBaseDataLoader {
   }
 
   async readParquetData<T>(buffer: Buffer): Promise<T[]> {
-    const reader = await ParquetReader.openBuffer(buffer);
+    const reader = await parquetjs.ParquetReader.openBuffer(buffer);
     const cursor = reader.getCursor();
     const rows: T[] = [];
 

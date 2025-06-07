@@ -63,6 +63,9 @@ data/*.parquet
 data/*.db
 data/*.sqlite
 data/*.sqlite3
+*.db
+*.db-shm
+*.db-wal
 
 # Python virtual environment (used for data analysis)
 data/venv/
