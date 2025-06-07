@@ -7,12 +7,12 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint src/**/*.ts --max-warnings=0",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",
     "format:check": "prettier --check src/**/*.ts",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky",
+    "prepare": "husky install",
     "check-all": "npm run lint:fix && npm run format && npm run typecheck"
   },
   "lint-staged": {
