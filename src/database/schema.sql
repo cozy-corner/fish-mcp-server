@@ -115,7 +115,8 @@ CREATE VIRTUAL TABLE IF NOT EXISTS fish_search USING fts5(
   japanese_names,
   english_names,
   content='fish',
-  content_rowid='spec_code'
+  content_rowid='spec_code',
+  tokenize='unicode61 remove_diacritics 1'  -- 日本語対応tokenizer（SQLite標準）
 );
 
 -- FTS5 Virtual Table: 一般名での検索
@@ -123,5 +124,6 @@ CREATE VIRTUAL TABLE IF NOT EXISTS name_search USING fts5(
   com_name,
   language,
   content='common_names', 
-  content_rowid='id'
+  content_rowid='id',
+  tokenize='unicode61 remove_diacritics 1'  -- 日本語対応tokenizer（SQLite標準）
 );
