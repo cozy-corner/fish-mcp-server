@@ -1,6 +1,6 @@
-import { FishBaseDataLoader } from './services/data-loader.js';
-import { SearchService } from './services/search-service.js';
-import { DatabaseManager } from './database/db-manager.js';
+import { FishBaseDataLoader } from '../src/services/data-loader.js';
+import { SearchService } from '../src/services/search-service.js';
+import { DatabaseManager } from '../src/database/db-manager.js';
 
 async function testSearch() {
   console.log('🐟 Fish MCP Server - 検索機能テスト');
