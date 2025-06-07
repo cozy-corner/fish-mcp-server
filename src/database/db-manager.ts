@@ -54,9 +54,14 @@ export class DatabaseManager {
 
   optimizeDatabase(): void {
     console.log('Optimizing database...');
-    this.db.exec('ANALYZE');
-    this.db.exec('PRAGMA optimize');
-    console.log('Database optimization completed');
+    try {
+      this.db.exec('ANALYZE');
+      this.db.exec('PRAGMA optimize');
+      console.log('Database optimization completed');
+    } catch (error) {
+      console.error('Database optimization failed:', error);
+      throw new Error(`Database optimization failed: ${error}`);
+    }
   }
 
   getStats(): {
