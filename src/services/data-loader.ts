@@ -82,13 +82,13 @@ export class FishBaseDataLoader {
   }
 
   async readParquetData<T>(buffer: Buffer): Promise<T[]> {
-    const reader = await (ParquetReader as any).openBuffer(buffer);
+    const reader = await ParquetReader.openBuffer(buffer);
     const cursor = reader.getCursor();
     const rows: T[] = [];
 
     let record = null;
     while ((record = await cursor.next())) {
-      rows.push(record);
+      rows.push(record as T);
     }
 
     await reader.close();
