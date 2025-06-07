@@ -15,11 +15,17 @@ When working on this project:
 ## Code Quality Rules
 **MANDATORY**: Run linting before any commit:
 - After implementing code: `npm run check-all` (lint:fix + format + typecheck)
+- **Before final commit**: `npm run check-ci` (CI-equivalent strict check)
 - Pre-commit hook automatically runs `lint-staged` on staged files
-- Never commit without passing lint checks
+- Never commit without passing both checks
 
 Available commands:
-- `npm run check-all` - Complete code quality check (recommended)
+- `npm run check-all` - Development check (auto-fixes issues)
+- `npm run check-ci` - **CI-equivalent strict check (no auto-fix)**
 - `npm run lint:fix` - Auto-fix ESLint issues
 - `npm run format` - Format with Prettier
 - `npm run typecheck` - TypeScript type checking
+
+**Workflow**:
+1. Development: `npm run check-all` (fixes issues automatically)
+2. Pre-commit: `npm run check-ci` (ensures CI compatibility)
