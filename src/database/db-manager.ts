@@ -87,6 +87,10 @@ export class DatabaseManager {
   }
 
   close(): void {
-    this.db.close();
+    try {
+      this.db.close();
+    } catch (error) {
+      console.error('Error closing database:', error);
+    }
   }
 }
