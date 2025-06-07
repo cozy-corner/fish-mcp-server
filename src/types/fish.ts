@@ -1,16 +1,17 @@
+/* eslint-disable no-unused-vars */
 import { Centimeters, Grams, Meters } from './units.js';
 
 // 魚の生息域（底生性/遊泳性）
 export enum HabitatZone {
   DEMERSAL = 'demersal',
-  BENTHOPELAGIC = 'benthopelagic', 
+  BENTHOPELAGIC = 'benthopelagic',
   REEF_ASSOCIATED = 'reef-associated',
   BATHYDEMERSAL = 'bathydemersal',
   BATHYPELAGIC = 'bathypelagic',
   PELAGIC = 'pelagic',
   PELAGIC_NERITIC = 'pelagic-neritic',
   PELAGIC_OCEANIC = 'pelagic-oceanic',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 // 危険性（注意: 生データには大文字小文字の不整合があるため、変換時に正規化する）
@@ -21,7 +22,7 @@ export enum DangerLevel {
   CIGUATERA = 'reports of ciguatera poisoning',
   POTENTIAL_PEST = 'potential pest',
   POISONOUS_TO_EAT = 'poisonous to eat',
-  OTHER = 'other'
+  OTHER = 'other',
 }
 
 // 商業的価値
@@ -32,7 +33,7 @@ export enum CommercialImportance {
   SUBSISTENCE = 'subsistence fisheries',
   POTENTIAL_INTEREST = 'of potential interest',
   NO_INTEREST = 'of no interest',
-  BYCATCH = 'bycatch'
+  BYCATCH = 'bycatch',
 }
 
 // 価格カテゴリ
@@ -41,7 +42,7 @@ export enum PriceCategory {
   HIGH = 'high',
   MEDIUM = 'medium',
   LOW = 'low',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 // 回遊パターン
@@ -53,7 +54,7 @@ export enum MigrationPattern {
   ANADROMOUS = 'anadromous',
   CATADROMOUS = 'catadromous',
   OCEANO_ESTUARINE = 'oceano-estuarine',
-  DIADROMOUS = 'diadromous'
+  DIADROMOUS = 'diadromous',
 }
 
 // 体型
@@ -62,7 +63,7 @@ export enum BodyShape {
   FUSIFORM_NORMAL = 'fusiform / normal',
   SHORT_DEEP = 'short and / or deep',
   EEL_LIKE = 'eel-like',
-  OTHER = 'other'
+  OTHER = 'other',
 }
 
 // 水族館での扱い
@@ -72,7 +73,7 @@ export enum AquariumSuitability {
   PUBLIC_AQUARIUMS = 'public aquariums',
   HIGHLY_COMMERCIAL = 'highly commercial',
   POTENTIAL = 'potential',
-  SHOW_AQUARIUM = 'show aquarium'
+  SHOW_AQUARIUM = 'show aquarium',
 }
 
 // 養殖での利用
@@ -80,14 +81,14 @@ export enum AquacultureUse {
   NEVER_RARELY = 'never/rarely',
   COMMERCIAL = 'commercial',
   EXPERIMENTAL = 'experimental',
-  LIKELY_FUTURE = 'likely future use'
+  LIKELY_FUTURE = 'likely future use',
 }
 
 // 餌としての利用
 export enum BaitUse {
   NEVER_RARELY = 'never/rarely',
   USUALLY = 'usually',
-  OCCASIONALLY = 'occasionally'
+  OCCASIONALLY = 'occasionally',
 }
 
 // 電気的能力
@@ -95,7 +96,7 @@ export enum ElectricAbility {
   NO_SPECIAL = 'no special ability',
   ELECTROSENSING_ONLY = 'electrosensing only',
   WEAKLY_DISCHARGING = 'weakly discharging',
-  STRONGLY_DISCHARGING = 'strongly discharging'
+  STRONGLY_DISCHARGING = 'strongly discharging',
 }
 
 export interface Fish {
@@ -107,22 +108,22 @@ export interface Fish {
   fbName?: string; // FishBase英語名
   famCode?: number;
   family?: string;
-  
+
   // 生息環境
-  fresh: boolean;         // 淡水
-  brackish: boolean;      // 汽水  
-  saltwater: boolean;     // 海水
+  fresh: boolean; // 淡水
+  brackish: boolean; // 汽水
+  saltwater: boolean; // 海水
   habitatZone?: HabitatZone; // 主要生息域（底生性/遊泳性）
-  
+
   // サイズ・重量（実際の範囲: 0.8-1700cm, 0.05g-34000kg）
-  length?: Centimeters;        // 最大体長
-  commonLength?: Centimeters;  // 一般的なサイズ
-  weight?: Grams;              // 最大重量
-  
+  length?: Centimeters; // 最大体長
+  commonLength?: Centimeters; // 一般的なサイズ
+  weight?: Grams; // 最大重量
+
   // 深度（実際の範囲: 0-8336m）
   depthRangeShallow?: Meters;
   depthRangeDeep?: Meters;
-  
+
   // 特性
   dangerous?: DangerLevel;
   gamefish: boolean;
@@ -131,13 +132,13 @@ export interface Fish {
   baitUse?: BaitUse;
   importance?: CommercialImportance;
   priceCategory?: PriceCategory;
-  
+
   // 生物学的特性
   bodyShape?: BodyShape;
   migrationPattern?: MigrationPattern;
   electricAbility?: ElectricAbility;
-  
+
   // 説明
-  comments?: string;      // 詳細な説明
-  remarks?: string;       // 備考
+  comments?: string; // 詳細な説明
+  remarks?: string; // 備考
 }
