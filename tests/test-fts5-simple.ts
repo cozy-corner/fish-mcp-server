@@ -1,4 +1,4 @@
-import { DatabaseManager } from './database/db-manager.js';
+import { DatabaseManager } from '../src/database/db-manager.js';
 
 async function testFTS5() {
   console.log('🔍 FTS5機能のシンプルテスト');
@@ -50,8 +50,26 @@ async function testFTS5() {
     // FTS5インデックスを構築
     console.log('🔧 FTS5インデックス構築...');
     
+    // content='fish' を使っているので、fishテーブルを更新すると自動的にFTS5が更新される
+    // ただし、japanese_namesとenglish_namesは仮想カラムなので、トリガーで管理する必要がある
+    
+    // 代わりに、外部コンテンツテーブルを使わない単純なFTS5テーブルを作成してテスト
+    db.exec(`DROP TABLE IF EXISTS fish_search_test`);
+    db.exec(`
+      CREATE VIRTUAL TABLE fish_search_test USING fts5(
+        spec_code UNINDEXED,
+        scientific_name,
+        fb_name,
+        comments,
+        remarks,
+        japanese_names,
+        english_names,
+        tokenize='unicode61 remove_diacritics 1'
+      )
+    `);
+    
     const buildFTS = db.prepare(`
-      INSERT INTO fish_search (rowid, scientific_name, fb_name, comments, remarks, japanese_names, english_names)
+      INSERT INTO fish_search_test (spec_code, scientific_name, fb_name, comments, remarks, japanese_names, english_names)
       SELECT 
         f.spec_code,
         f.scientific_name,
@@ -75,10 +93,10 @@ async function testFTS5() {
     const fishCount = db.prepare('SELECT COUNT(*) as count FROM fish').get() as {count: number};
     console.log(`魚データ: ${fishCount.count}件`);
     
-    const ftsCount = db.prepare('SELECT COUNT(*) as count FROM fish_search').get() as {count: number};
+    const ftsCount = db.prepare('SELECT COUNT(*) as count FROM fish_search_test').get() as {count: number};
     console.log(`FTS5データ: ${ftsCount.count}件`);
 
-    const sampleFts = db.prepare('SELECT * FROM fish_search LIMIT 1').get();
+    const sampleFts = db.prepare('SELECT * FROM fish_search_test LIMIT 1').get();
     console.log('FTS5サンプルデータ:', sampleFts);
 
     // FTS5検索テスト
@@ -98,13 +116,14 @@ async function testFTS5() {
 
     const searchQuery = db.prepare(`
       SELECT 
+        spec_code,
         scientific_name,
         fb_name,
         comments,
         japanese_names,
         rank
-      FROM fish_search
-      WHERE fish_search MATCH ?
+      FROM fish_search_test
+      WHERE fish_search_test MATCH ?
       ORDER BY rank
       LIMIT 5
     `);
@@ -130,6 +149,17 @@ async function testFTS5() {
       }
     }
 
+    // 日本語検索の改善テスト
+    console.log('\n🔍 日本語検索の分析');
+    console.log('===================');
+    
+    // 実際のコンテンツを確認
+    const allData = db.prepare('SELECT * FROM fish_search_test').all();
+    console.log('\n保存されているデータ:');
+    allData.forEach((row: any) => {
+      console.log(`- ${row.japanese_names}: ${row.comments} | ${row.remarks}`);
+    });
+
     // 高度なFTS5機能テスト
     console.log('\n🔍 高度なFTS5機能テスト');
     console.log('========================');
@@ -139,6 +169,10 @@ async function testFTS5() {
       '"深海魚"',         // フレーズ検索
       'マグロ OR サメ',   // OR検索
       'tun*',            // ワイルドカード
+      '大型の',          // 助詞付き
+      '回遊魚',          // 複合語
+      '商業的',          // 形容詞
+      '危険性',          // 名詞
     ];
 
     for (const query of advancedQueries) {
@@ -153,6 +187,38 @@ async function testFTS5() {
         } else {
           results.forEach((row: any, index: number) => {
             console.log(`   ${index + 1}. ${row.japanese_names || row.fb_name}`);
+          });
+        }
+      } catch (error) {
+        console.log(`   エラー: ${error}`);
+      }
+    }
+
+    // 全文検索テスト
+    console.log('\n🔍 全文一致検索テスト');
+    console.log('======================');
+    
+    const fullTextQueries = [
+      '大型の回遊魚',       // フルフレーズ
+      '回遊',              // 部分文字列
+      '危険性は低い',       // フレーズ
+      '深海に生息',         // フレーズ
+      '美しい赤色',         // フレーズ
+    ];
+    
+    for (const query of fullTextQueries) {
+      console.log(`\n🔍 全文検索: "${query}"`);
+      console.log('─'.repeat(40));
+      
+      try {
+        const results = searchQuery.all(query);
+        
+        if (results.length === 0) {
+          console.log('   結果なし');
+        } else {
+          results.forEach((row: any, index: number) => {
+            console.log(`   ${index + 1}. ${row.japanese_names || row.fb_name}`);
+            console.log(`      コメント: ${row.comments}`);
           });
         }
       } catch (error) {
