@@ -11,8 +11,15 @@ export class DatabaseManager {
   private isInitialized = false;
 
   constructor(dbPath: string = 'fish.db') {
-    this.db = new Database(dbPath);
-    this.setupPragmas();
+    if (!dbPath || typeof dbPath !== 'string') {
+      throw new Error('Database path must be a non-empty string');
+    }
+    try {
+      this.db = new Database(dbPath);
+      this.setupPragmas();
+    } catch (error) {
+      throw new Error(`Failed to create database connection: ${error}`);
+    }
   }
 
   private setupPragmas(): void {
