@@ -17,6 +17,12 @@ export default [
       parserOptions: {
         ecmaVersion: 2020,
         sourceType: 'module'
+      },
+      globals: {
+        console: 'readonly',
+        Buffer: 'readonly',
+        fetch: 'readonly',
+        process: 'readonly'
       }
     },
     rules: {
@@ -29,7 +35,7 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
       
       // 一般的なルール
-      'no-console': 'warn',
+      'no-console': 'off',
       'prefer-const': 'error'
     }
   },
