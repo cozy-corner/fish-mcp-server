@@ -74,62 +74,126 @@ export class SearchService {
     this.db = db;
   }
 
+  // ひらがなをカタカナに変換
+  private toKatakana(str: string): string {
+    return str.replace(/[\u3041-\u3096]/g, match => {
+      const chr = match.charCodeAt(0) + 0x60;
+      return String.fromCharCode(chr);
+    });
+  }
+
+  // カタカナをひらがなに変換
+  private toHiragana(str: string): string {
+    return str.replace(/[\u30a1-\u30f6]/g, match => {
+      const chr = match.charCodeAt(0) - 0x60;
+      return String.fromCharCode(chr);
+    });
+  }
+
   searchFishByName(query: string, limit: number = 10): FishWithMatch[] {
-    // 1. Japanese name exact match
+    // クエリの前処理
+    const katakanaQuery = this.toKatakana(query);
+    const hiraganaQuery = this.toHiragana(query);
+
+    // 1. Japanese name exact match (original, katakana, hiragana)
     let results = this.db
       .prepare(
         `
       SELECT f.*, 'japanese_exact' as match_type, cn.com_name as matched_name
       FROM fish f
       JOIN common_names cn ON f.spec_code = cn.spec_code
-      WHERE cn.language = 'Japanese' AND cn.com_name = ?
+      WHERE cn.language = 'Japanese' AND cn.com_name IN (?, ?, ?)
       ORDER BY cn.preferred_name DESC
       LIMIT ?
     `
       )
-      .all(query, limit) as FishDbRow[];
+      .all(query, katakanaQuery, hiraganaQuery, limit) as FishDbRow[];
 
     if (results.length > 0) {
       return this.transformDbRowsToFish(results);
     }
 
-    // 2. Japanese name partial match
+    // 2. Japanese name partial match (including katakana/hiragana variants)
     results = this.db
       .prepare(
         `
       SELECT f.*, 'japanese_partial' as match_type, cn.com_name as matched_name
       FROM fish f
       JOIN common_names cn ON f.spec_code = cn.spec_code
-      WHERE cn.language = 'Japanese' AND cn.com_name LIKE ?
+      WHERE cn.language = 'Japanese' AND (
+        cn.com_name LIKE ? OR cn.com_name LIKE ? OR cn.com_name LIKE ?
+      )
       ORDER BY cn.preferred_name DESC, cn.com_name
       LIMIT ?
     `
       )
-      .all(`%${query}%`, limit) as FishDbRow[];
+      .all(
+        `%${query}%`,
+        `%${katakanaQuery}%`,
+        `%${hiraganaQuery}%`,
+        limit
+      ) as FishDbRow[];
 
     if (results.length > 0) {
       return this.transformDbRowsToFish(results);
     }
 
-    // 3. FTS5 search
+    // 3. Comments/Remarks partial match (for descriptive queries)
+    results = this.db
+      .prepare(
+        `
+      SELECT DISTINCT f.*, 'description_match' as match_type, NULL as matched_name
+      FROM fish f
+      WHERE f.comments LIKE ? OR f.remarks LIKE ?
+      LIMIT ?
+    `
+      )
+      .all(`%${query}%`, `%${query}%`, limit) as FishDbRow[];
+
+    if (results.length > 0) {
+      return this.transformDbRowsToFish(results);
+    }
+
+    // 4. FTS5 search (try both original and katakana for better results)
+    // First try katakana version (better for single words)
     results = this.db
       .prepare(
         `
       SELECT f.*, 'fts_search' as match_type, NULL as matched_name
       FROM fish f
       JOIN fish_search fs ON f.spec_code = fs.rowid
-      WHERE fs MATCH ?
+      WHERE fish_search MATCH ?
       ORDER BY rank
       LIMIT ?
     `
       )
-      .all(query, limit) as FishDbRow[];
+      .all(katakanaQuery, limit) as FishDbRow[];
 
     if (results.length > 0) {
       return this.transformDbRowsToFish(results);
     }
 
-    // 4. English name fallback
+    // Then try original query (for English or already katakana)
+    if (query !== katakanaQuery) {
+      results = this.db
+        .prepare(
+          `
+        SELECT f.*, 'fts_search' as match_type, NULL as matched_name
+        FROM fish f
+        JOIN fish_search fs ON f.spec_code = fs.rowid
+        WHERE fs MATCH ?
+        ORDER BY rank
+        LIMIT ?
+      `
+        )
+        .all(query, limit) as FishDbRow[];
+
+      if (results.length > 0) {
+        return this.transformDbRowsToFish(results);
+      }
+    }
+
+    // 5. English name fallback
     results = this.db
       .prepare(
         `
