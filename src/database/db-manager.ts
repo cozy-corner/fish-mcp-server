@@ -70,25 +70,33 @@ export class DatabaseManager {
     japaneseNameCount: number;
     englishNameCount: number;
   } {
-    const fishCount = this.db
-      .prepare('SELECT COUNT(*) as count FROM fish')
-      .get() as { count: number };
-    const commonNameCount = this.db
-      .prepare('SELECT COUNT(*) as count FROM common_names')
-      .get() as { count: number };
-    const japaneseNameCount = this.db
-      .prepare('SELECT COUNT(*) as count FROM common_names WHERE language = ?')
-      .get('Japanese') as { count: number };
-    const englishNameCount = this.db
-      .prepare('SELECT COUNT(*) as count FROM common_names WHERE language = ?')
-      .get('English') as { count: number };
+    try {
+      const fishCount = this.db
+        .prepare('SELECT COUNT(*) as count FROM fish')
+        .get() as { count: number };
+      const commonNameCount = this.db
+        .prepare('SELECT COUNT(*) as count FROM common_names')
+        .get() as { count: number };
+      const japaneseNameCount = this.db
+        .prepare(
+          'SELECT COUNT(*) as count FROM common_names WHERE language = ?'
+        )
+        .get('Japanese') as { count: number };
+      const englishNameCount = this.db
+        .prepare(
+          'SELECT COUNT(*) as count FROM common_names WHERE language = ?'
+        )
+        .get('English') as { count: number };
 
-    return {
-      fishCount: fishCount.count,
-      commonNameCount: commonNameCount.count,
-      japaneseNameCount: japaneseNameCount.count,
-      englishNameCount: englishNameCount.count,
-    };
+      return {
+        fishCount: fishCount.count,
+        commonNameCount: commonNameCount.count,
+        japaneseNameCount: japaneseNameCount.count,
+        englishNameCount: englishNameCount.count,
+      };
+    } catch (error) {
+      throw new Error(`Failed to get database statistics: ${error}`);
+    }
   }
 
   close(): void {
