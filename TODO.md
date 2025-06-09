@@ -16,7 +16,7 @@
 - [x] SQLiteデータベース設計（Virtual Table含む）
 - [x] better-sqlite3のインストール
 - [x] Parquet→SQLite変換処理の実装
-- [ ] FTS5による日本語全文検索機能の実装
+- [x] FTS5による日本語全文検索機能の実装
 - [ ] 特徴検索機能の実装（SQLクエリ）
 
 ## MCPサーバー実装
