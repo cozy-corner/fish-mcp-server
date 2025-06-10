@@ -29,7 +29,7 @@ async function testMCPServer() {
   serverProcess.stdout.on('data', (data) => {
     try {
       const response = JSON.parse(data.toString());
-      if (response.result && response.result.content) {
+      if (response.result?.content?.[0]?.text) {
         console.log('\n📋 Result:');
         console.log(response.result.content[0].text);
       }
