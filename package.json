@@ -10,9 +10,14 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
     "test-search": "tsx tests/test-search.ts",
     "test-fts5": "tsx tests/test-fts5-simple.ts",
     "test-improved": "tsx tests/test-improved-search.ts",
+    "test-mcp": "tsx tests/test-mcp-integration.ts",
+    "test-mcp-interactive": "tsx tests/test-mcp-interactive.ts",
+    "load-data": "tsx scripts/load-data.ts",
+    "load-sample-data": "tsx scripts/load-sample-data.ts",
     "lint": "eslint src/**/*.ts --max-warnings=0",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",
@@ -49,8 +54,10 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.53.0",
+    "@modelcontextprotocol/sdk": "^1.12.1",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^11.10.0",
-    "parquetjs": "^0.11.2"
+    "parquetjs": "^0.11.2",
+    "zod": "^3.25.56"
   }
 }
