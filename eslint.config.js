@@ -24,8 +24,7 @@ export default [
         fetch: 'readonly',
         process: 'readonly',
         URLSearchParams: 'readonly',
-        setTimeout: 'readonly',
-        Date: 'readonly'
+        setTimeout: 'readonly'
       }
     },
     rules: {
