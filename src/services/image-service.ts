@@ -1,4 +1,5 @@
 // Using Node.js built-in fetch API (Node 18+)
+import type { FishImage } from '../types/fish.js';
 
 interface INaturalistObservation {
   id: number;
@@ -17,11 +18,6 @@ interface INaturalistObservation {
 interface INaturalistResponse {
   results: INaturalistObservation[];
   total_results: number;
-}
-
-export interface FishImage {
-  url: string;
-  attribution: string;
 }
 
 export class ImageService {
