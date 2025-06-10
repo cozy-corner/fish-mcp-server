@@ -94,7 +94,7 @@ async function loadSampleData() {
         weight: g(15000),
         depthRangeShallow: m(100),
         depthRangeDeep: m(1000),
-        dangerous: DangerLevel.VENOMOUS,
+        dangerous: DangerLevel.TRAUMATOGENIC,
         gamefish: true,
         aquarium: AquariumSuitability.NO,
         importance: CommercialImportance.COMMERCIAL,
