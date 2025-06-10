@@ -19,14 +19,14 @@ async function loadData() {
 
     // データ読み込み
     console.log('📥 Loading fish data from FishBase...');
-    const { allFish, commonNames } = await dataLoader.loadAllFishData();
+    const { species, commonNames } = await dataLoader.loadAllFishData();
     
-    console.log(`✅ Loaded ${allFish.length} fish species`);
+    console.log(`✅ Loaded ${species.length} fish species`);
     console.log(`✅ Loaded ${commonNames.length} common names`);
 
     // データ挿入
     console.log('\n💾 Inserting data into database...');
-    dataImporter.insertFish(allFish);
+    dataImporter.insertFish(species);
     dataImporter.insertCommonNames(commonNames);
 
     // FTSインデックス構築
