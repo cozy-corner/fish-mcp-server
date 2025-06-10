@@ -123,7 +123,7 @@ async function testMCPServer() {
     assert.ok(englishSearchResponse.result, 'English search should have result');
     const englishText = englishSearchResponse.result.content[0].text;
     assert.ok(englishText.includes('shark'), 'Should contain search query');
-    assert.ok(englishText.includes('Great white') || englishText.includes('ホオジロザメ'), 'Should find shark results');
+    assert.ok(englishText.includes('Great white') || englishText.includes('Carcharodon'), 'Should find shark results');
     console.log('✅ English name search verification passed');
 
     // Test 4: Dangerous fish search (may have SQL errors, but should respond)
