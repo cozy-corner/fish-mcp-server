@@ -112,8 +112,8 @@ export class FishMCPServer {
 
     const formattedResults = results
       .map((fish, index) => {
-        const extendedFish = fish as Fish & { japaneseNames?: string };
-        const names = extendedFish.japaneseNames || fish.fbName || '名称不明';
+        const extendedFish = fish as Fish & { matchedName?: string };
+        const names = extendedFish.matchedName || fish.fbName || '名称不明';
         const size = fish.length ? `${fish.length}cm` : '不明';
         const habitat = this.getHabitatDescription(fish);
         const danger = this.getDangerDescription(fish.dangerous);
@@ -149,8 +149,8 @@ export class FishMCPServer {
 
     const formattedResults = results
       .map((fish, index) => {
-        const extendedFish = fish as Fish & { japaneseNames?: string };
-        const names = extendedFish.japaneseNames || fish.fbName || '名称不明';
+        const extendedFish = fish as Fish & { matchedName?: string };
+        const names = extendedFish.matchedName || fish.fbName || '名称不明';
         const size = fish.length ? `${fish.length}cm` : '不明';
         return `${index + 1}. ${names}（${size}）`;
       })
