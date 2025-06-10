@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+// Using Node.js built-in fetch API (Node 18+)
 
 interface INaturalistObservation {
   id: number;
