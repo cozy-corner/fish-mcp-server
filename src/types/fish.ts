@@ -99,6 +99,12 @@ export enum ElectricAbility {
   STRONGLY_DISCHARGING = 'strongly discharging',
 }
 
+// 魚の画像情報
+export interface FishImage {
+  url: string; // 画像URL
+  attribution: string; // 著作権表示
+}
+
 export interface Fish {
   specCode: number;
   genus: string;
@@ -143,8 +149,5 @@ export interface Fish {
   remarks?: string; // 備考
 
   // 画像情報
-  images?: Array<{
-    url: string; // 画像URL
-    attribution: string; // 著作権表示
-  }>; // 画像情報配列（外部API経由で取得）
+  images?: FishImage[]; // 画像情報配列（外部API経由で取得）
 }
