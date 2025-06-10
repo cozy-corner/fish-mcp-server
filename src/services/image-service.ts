@@ -102,8 +102,8 @@ export class ImageService {
    * iNaturalist画像URLを高品質版に変換
    */
   private getHighQualityImageUrl(url: string): string {
-    // iNaturalistのURLパターン: square.jpg → medium.jpg or large.jpg
-    return url.replace('/square.', '/medium.');
+    // より安全なURL変換（サイズ部分を正規表現で置換）
+    return url.replace(/(\/)[a-z]+(\.\w+)$/, '$1medium$2');
   }
 
   /**
