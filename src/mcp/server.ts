@@ -51,7 +51,7 @@ export class FishMCPServer {
             }
 
             console.error(`[FishMCPServer] Searching by name: "${query}"`);
-            const results = this.searchService.searchFishByName(
+            const results = await this.searchService.searchFishByName(
               query,
               args?.limit as number | undefined
             );
@@ -73,7 +73,8 @@ export class FishMCPServer {
               `[FishMCPServer] Searching by features:`,
               JSON.stringify(options)
             );
-            const results = this.searchService.searchFishByFeatures(options);
+            const results =
+              await this.searchService.searchFishByFeatures(options);
             console.error(`[FishMCPServer] Found ${results.length} results`);
 
             return {
@@ -117,12 +118,16 @@ export class FishMCPServer {
         const size = fish.length ? `${fish.length}cm` : '不明';
         const habitat = this.getHabitatDescription(fish);
         const danger = this.getDangerDescription(fish.dangerous);
+        const image =
+          fish.images && fish.images.length > 0
+            ? `\n   画像: ${fish.images[0].url}\n   画像提供: ${fish.images[0].attribution}`
+            : '';
+        const comments = fish.comments ? `\n   ${fish.comments}` : '';
 
         return `${index + 1}. ${names}（${fish.scientificName}）
    大きさ: ${size}
    生息地: ${habitat}
-   危険度: ${danger}
-   ${fish.comments || ''}`;
+   危険度: ${danger}${image}${comments}`;
       })
       .join('\n\n');
 
