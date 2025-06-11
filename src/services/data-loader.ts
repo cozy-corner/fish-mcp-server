@@ -401,7 +401,7 @@ export class FishBaseDataLoader {
         const fieldName = arrowTable.schema.fields[j].name;
         row[fieldName] = column?.get(i);
       }
-      rawRows.push(row as FishBaseSpeciesRow);
+      rawRows.push(row as unknown as FishBaseSpeciesRow);
     }
 
     console.log(`Loaded ${rawRows.length} species records`);
@@ -446,7 +446,7 @@ export class FishBaseDataLoader {
         const fieldName = arrowTable.schema.fields[j].name;
         row[fieldName] = column?.get(i);
       }
-      rawRows.push(row as FishBaseCommonNameRow);
+      rawRows.push(row as unknown as FishBaseCommonNameRow);
     }
 
     console.log(`Loaded ${rawRows.length} common name records`);
