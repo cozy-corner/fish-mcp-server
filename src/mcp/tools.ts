@@ -16,6 +16,11 @@ export const searchFishByNameTool: Tool = {
         description: '検索結果の最大件数（デフォルト: 10）',
         default: 10,
       },
+      includeImages: {
+        type: 'boolean',
+        description: '画像情報を含めるかどうか（デフォルト: false）',
+        default: false,
+      },
     },
     required: ['query'],
   },
@@ -55,6 +60,11 @@ export const searchFishByFeaturesTool: Tool = {
         type: 'number',
         description: '検索結果の最大件数（デフォルト: 20）',
         default: 20,
+      },
+      includeImages: {
+        type: 'boolean',
+        description: '画像情報を含めるかどうか（デフォルト: false）',
+        default: false,
       },
     },
     required: [],
