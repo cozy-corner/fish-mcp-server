@@ -28,16 +28,17 @@
 - [x] サンプルデータ読み込みスクリプト
 - [x] MCPプロトコル完全準拠
 
-## 画像取得API実装 🖼️
+## 画像取得API実装（完了） ✅
 ### Phase 1（MVP - 優先度：高）
 - [x] Fish型定義にimages配列フィールドを追加
 - [x] ImageServiceクラスの作成（iNaturalist API連携）
-- [ ] SearchServiceにImageService統合
-- [ ] MCPツールの戻り値に画像情報追加
+- [x] SearchServiceにImageService統合
+- [x] MCPツールの戻り値に画像情報追加
+- [x] includeImagesパラメータ追加（オプショナル画像取得）
 
 ### Phase 1.5（安定性向上 - 優先度：中）
+- [x] 画像取得機能の統合テスト作成（test-image-integration.ts）
 - [ ] 画像取得機能の単体テスト作成
-- [ ] 画像取得機能の統合テスト作成
 
 ### Phase 2（拡張機能 - 優先度：低）
 - [ ] 画像URLキャッシュ用のデータベーステーブル追加
