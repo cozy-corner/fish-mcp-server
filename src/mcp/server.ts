@@ -53,7 +53,8 @@ export class FishMCPServer {
             console.error(`[FishMCPServer] Searching by name: "${query}"`);
             const results = await this.searchService.searchFishByName(
               query,
-              args?.limit as number | undefined
+              args?.limit as number | undefined,
+              args?.includeImages as boolean | undefined
             );
             console.error(`[FishMCPServer] Found ${results.length} results`);
 
