@@ -22,7 +22,9 @@ export default [
         console: 'readonly',
         Buffer: 'readonly',
         fetch: 'readonly',
-        process: 'readonly'
+        process: 'readonly',
+        URLSearchParams: 'readonly',
+        setTimeout: 'readonly'
       }
     },
     rules: {
