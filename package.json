@@ -31,7 +31,8 @@
     "src/**/*.ts": [
       "eslint --fix",
       "prettier --write",
-      "git add"
+      "git add",
+      "eslint --max-warnings=0"
     ]
   },
   "keywords": [],
