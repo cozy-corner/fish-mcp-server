@@ -14,6 +14,7 @@ import {
 } from '../types/fish.js';
 import { CommonName } from './data-loader.js';
 import { cm, g, m } from '../types/units.js';
+import { ImageService } from './image-service.js';
 
 export interface SearchFeatures {
   minLength?: number;
@@ -69,9 +70,11 @@ interface CommonNameDbRow {
 
 export class SearchService {
   private db: Database.Database;
+  private imageService: ImageService;
 
-  constructor(db: Database.Database) {
+  constructor(db: Database.Database, imageService?: ImageService) {
     this.db = db;
+    this.imageService = imageService || new ImageService();
   }
 
   // ひらがなをカタカナに変換
@@ -90,7 +93,10 @@ export class SearchService {
     });
   }
 
-  searchFishByName(query: string, limit: number = 10): FishWithMatch[] {
+  async searchFishByName(
+    query: string,
+    limit: number = 10
+  ): Promise<FishWithMatch[]> {
     // クエリの前処理
     const katakanaQuery = this.toKatakana(query);
     const hiraganaQuery = this.toHiragana(query);
@@ -110,7 +116,7 @@ export class SearchService {
       .all(query, katakanaQuery, hiraganaQuery, limit) as FishDbRow[];
 
     if (results.length > 0) {
-      return this.transformDbRowsToFish(results);
+      return this.transformDbRowsToFishWithImages(results);
     }
 
     // 2. Japanese name partial match (including katakana/hiragana variants)
@@ -135,7 +141,7 @@ export class SearchService {
       ) as FishDbRow[];
 
     if (results.length > 0) {
-      return this.transformDbRowsToFish(results);
+      return this.transformDbRowsToFishWithImages(results);
     }
 
     // 3. Comments/Remarks partial match (for descriptive queries)
@@ -210,7 +216,10 @@ export class SearchService {
     return this.transformDbRowsToFish(results);
   }
 
-  searchFishByFeatures(features: SearchFeatures, limit: number = 10): Fish[] {
+  async searchFishByFeatures(
+    features: SearchFeatures,
+    limit: number = 10
+  ): Promise<Fish[]> {
     const whereConditions: string[] = [];
     const params: (string | number)[] = [];
 
@@ -263,7 +272,7 @@ export class SearchService {
       )
       .all(...params, limit) as FishDbRow[];
 
-    return this.transformDbRowsToFish(results);
+    return this.transformDbRowsToFishWithImages(results);
   }
 
   getFishBySpecCode(specCode: number): Fish | null {
@@ -291,6 +300,32 @@ export class SearchService {
       language: row.language,
       preferred: Boolean(row.preferred_name),
     }));
+  }
+
+  private async transformDbRowsToFishWithImages(
+    rows: FishDbRow[]
+  ): Promise<FishWithMatch[]> {
+    const fishList = this.transformDbRowsToFish(rows);
+
+    // 各魚の画像を並行して取得
+    const fishWithImages = await Promise.all(
+      fishList.map(async fish => {
+        try {
+          const images = await this.imageService.getImagesForFish(
+            fish.scientificName
+          );
+          return { ...fish, images };
+        } catch (error) {
+          console.error(
+            `Failed to get images for ${fish.scientificName}:`,
+            error
+          );
+          return { ...fish, images: [] };
+        }
+      })
+    );
+
+    return fishWithImages;
   }
 
   private transformDbRowsToFish(rows: FishDbRow[]): FishWithMatch[] {
