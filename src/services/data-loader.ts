@@ -1,4 +1,5 @@
-import parquetjs from 'parquetjs';
+import wasmInit, { readParquet } from 'parquet-wasm/esm';
+import { tableFromIPC } from 'apache-arrow';
 import {
   Fish,
   HabitatZone,
@@ -62,37 +63,47 @@ export interface CommonName {
 export class FishBaseDataLoader {
   private static readonly FISHBASE_S3_BASE =
     'https://fishbase.ropensci.org/data/';
+  private static wasmInitialized = false;
 
   async downloadParquetFile(filename: string): Promise<Buffer> {
     const url = `${FishBaseDataLoader.FISHBASE_S3_BASE}${filename}`;
     console.log(`Downloading ${filename} from FishBase...`);
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(
-        `Failed to download ${filename}: ${response.status} ${response.statusText}`
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to download ${filename}: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+      console.log(
+        `Downloaded ${filename}: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`
       );
+      return buffer;
+    } catch (error) {
+      console.warn(`Download failed for ${filename}, trying local file...`);
+
+      // Fallback to local file
+      const fs = await import('fs/promises');
+      const path = await import('path');
+
+      const localPath = path.join(process.cwd(), 'data', filename);
+      console.log(`Loading ${filename} from local file: ${localPath}`);
+
+      try {
+        const buffer = await fs.readFile(localPath);
+        console.log(
+          `Loaded local ${filename}: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`
+        );
+        return buffer;
+      } catch (localError) {
+        throw new Error(
+          `Failed to download ${filename} from remote (${error}) and local file not found (${localError})`
+        );
+      }
     }
-
-    const buffer = Buffer.from(await response.arrayBuffer());
-    console.log(
-      `Downloaded ${filename}: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`
-    );
-    return buffer;
-  }
-
-  async readParquetData<T>(buffer: Buffer): Promise<T[]> {
-    const reader = await parquetjs.ParquetReader.openBuffer(buffer);
-    const cursor = reader.getCursor();
-    const rows: T[] = [];
-
-    let record = null;
-    while ((record = await cursor.next())) {
-      rows.push(record as T);
-    }
-
-    await reader.close();
-    return rows;
   }
 
   private normalizeHabitatZone(demersPelag?: string): HabitatZone | undefined {
@@ -353,8 +364,45 @@ export class FishBaseDataLoader {
 
   async loadSpeciesData(): Promise<Fish[]> {
     console.log('Loading all species data from FishBase...');
-    const buffer = await this.downloadParquetFile('species.parquet');
-    const rawRows = await this.readParquetData<FishBaseSpeciesRow>(buffer);
+
+    // Initialize WASM if not already done
+    if (!FishBaseDataLoader.wasmInitialized) {
+      const path = await import('path');
+      const fs = await import('fs');
+      const wasmPath = path.join(
+        process.cwd(),
+        'node_modules',
+        'parquet-wasm',
+        'esm',
+        'parquet_wasm_bg.wasm'
+      );
+      const wasmBuffer = fs.readFileSync(wasmPath);
+      await wasmInit(wasmBuffer);
+      FishBaseDataLoader.wasmInitialized = true;
+    }
+
+    const path = await import('path');
+    const fs = await import('fs');
+    const filePath = path.join(process.cwd(), 'data', 'species.parquet');
+
+    const buffer = fs.readFileSync(filePath);
+    const wasmTable = readParquet(new Uint8Array(buffer));
+
+    // Convert to Arrow table using IPC stream
+    const arrowTable = tableFromIPC(wasmTable.intoIPCStream());
+
+    // Convert Arrow table to JavaScript objects
+    // Using traditional for-loop for performance with large dataset (35,731 rows × 102 columns)
+    const rawRows: FishBaseSpeciesRow[] = [];
+    for (let i = 0; i < arrowTable.numRows; i++) {
+      const row: any = {};
+      for (let j = 0; j < arrowTable.numCols; j++) {
+        const column = arrowTable.getChildAt(j);
+        const fieldName = arrowTable.schema.fields[j].name;
+        row[fieldName] = column?.get(i);
+      }
+      rawRows.push(row as FishBaseSpeciesRow);
+    }
 
     console.log(`Loaded ${rawRows.length} species records`);
     return rawRows.map(row => this.transformSpeciesRow(row));
@@ -362,12 +410,55 @@ export class FishBaseDataLoader {
 
   async loadCommonNames(): Promise<CommonName[]> {
     console.log('Loading all common names from FishBase...');
-    const buffer = await this.downloadParquetFile('comnames.parquet');
-    const rawRows = await this.readParquetData<FishBaseCommonNameRow>(buffer);
+    const path = await import('path');
+    const fs = await import('fs');
+    const filePath = path.join(process.cwd(), 'data', 'comnames.parquet');
+
+    // Initialize WASM if not already done
+    if (!FishBaseDataLoader.wasmInitialized) {
+      const path = await import('path');
+      const fs = await import('fs');
+      const wasmPath = path.join(
+        process.cwd(),
+        'node_modules',
+        'parquet-wasm',
+        'esm',
+        'parquet_wasm_bg.wasm'
+      );
+      const wasmBuffer = fs.readFileSync(wasmPath);
+      await wasmInit(wasmBuffer);
+      FishBaseDataLoader.wasmInitialized = true;
+    }
+
+    const buffer = fs.readFileSync(filePath);
+    const wasmTable = readParquet(new Uint8Array(buffer));
+
+    // Convert to Arrow table using IPC stream
+    const arrowTable = tableFromIPC(wasmTable.intoIPCStream());
+
+    // Convert Arrow table to JavaScript objects
+    // Using traditional for-loop for performance with large dataset (330,105 rows × 35 columns)
+    const rawRows: FishBaseCommonNameRow[] = [];
+    for (let i = 0; i < arrowTable.numRows; i++) {
+      const row: any = {};
+      for (let j = 0; j < arrowTable.numCols; j++) {
+        const column = arrowTable.getChildAt(j);
+        const fieldName = arrowTable.schema.fields[j].name;
+        row[fieldName] = column?.get(i);
+      }
+      rawRows.push(row as FishBaseCommonNameRow);
+    }
 
     console.log(`Loaded ${rawRows.length} common name records`);
 
-    return rawRows.map(row => ({
+    const filteredRows = rawRows.filter(
+      row => row.Language === 'English' || row.Language === 'Japanese'
+    );
+    console.log(
+      `Filtered to ${filteredRows.length} English/Japanese records (${rawRows.length - filteredRows.length} other languages excluded)`
+    );
+
+    return filteredRows.map(row => ({
       comName: row.ComName,
       specCode: row.SpecCode,
       language: row.Language,
