@@ -20,12 +20,19 @@ gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
 
 ### Required Steps (Execute in this order)
 1. **Get PR review comments**: `gh api repos/{owner}/{repo}/pulls/{pr_number}/comments`
-2. **Reply to each comment_id**: 
+2. **Report all comments to user**: List all comments with their IDs and content
+3. **Wait for user instructions**: DO NOT reply to any comments without explicit user approval
+4. **Reply only when instructed**: 
    ```bash
    gh api repos/{owner}/{repo}/pulls/{pr_number}/comments --method POST \
-     --field body="Your reply message here" \
+     --field body="User-provided reply message" \
      --field in_reply_to={comment_id}
    ```
+
+### ⚠️ CRITICAL: Never Auto-Reply
+- **NEVER** reply to comments without explicit user instruction
+- **ALWAYS** ask user how to respond to each comment
+- **WAIT** for user to provide specific reply text or approve "won't implement" responses
 
 ### ⚠️ FORBIDDEN Commands (Never Use)
 Do not use these commands (Reason: Posts to PR body or overwrites existing comments)
@@ -33,10 +40,10 @@ Do not use these commands (Reason: Posts to PR body or overwrites existing comme
 - `gh api repos/{owner}/{repo}/pulls/{pr_number}/comments --method POST --field body="..."` (without in_reply_to)
 - `gh api repos/{owner}/{repo}/pulls/comments/{comment_id} --method POST` (overwrites existing comment)
 
-### Response Requirements
-1. **Reply to EVERY comment** (including nitpicks)
+### Response Requirements (When User Instructs)
+1. **Reply to EVERY comment** user requests response to
 2. **Include commit IDs** for fixes: `Fixed in commit [abc123](link)`
-3. **Mark status clearly**: "Fixed", "Won't implement", "Acknowledged"
+3. **Mark status clearly**: "Fixed", "Won't implement", "Acknowledged" (only when user specifies)
 4. **Use in_reply_to** for direct comment replies
 
 ## Important Documentation
