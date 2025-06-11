@@ -38,6 +38,9 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@types/node": "^22.15.30",
     "@types/parquetjs": "^0.10.6",
