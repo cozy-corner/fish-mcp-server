@@ -59,7 +59,9 @@
     "@anthropic-ai/sdk": "^0.53.0",
     "@modelcontextprotocol/sdk": "^1.12.1",
     "@types/better-sqlite3": "^7.6.13",
+    "apache-arrow": "^20.0.0",
     "better-sqlite3": "^11.10.0",
+    "parquet-wasm": "^0.6.1",
     "parquetjs": "^0.11.2",
     "zod": "^3.25.56"
   }
