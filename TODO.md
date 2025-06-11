@@ -30,14 +30,12 @@
 
 ## 画像取得API実装 🖼️
 ### Phase 1（MVP - 優先度：高）
-- [ ] Fish型定義にimageUrl、imageAttributionフィールドを追加
-- [ ] ImageServiceクラスの作成（iNaturalist API連携）
-- [ ] SearchServiceにImageService統合（画像URL取得処理追加）
-- [ ] MCPツール（search_fish_by_name、search_fish_by_features）の戻り値に画像情報追加
+- [x] Fish型定義にimages配列フィールドを追加
+- [x] ImageServiceクラスの作成（iNaturalist API連携）
+- [ ] SearchServiceにImageService統合
+- [ ] MCPツールの戻り値に画像情報追加
 
 ### Phase 1.5（安定性向上 - 優先度：中）
-- [ ] iNaturalist APIのレート制限対応（スロットリング実装）
-- [ ] 画像取得エラー時のフォールバック処理実装
 - [ ] 画像取得機能の単体テスト作成
 - [ ] 画像取得機能の統合テスト作成
 
