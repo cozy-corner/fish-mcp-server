@@ -395,7 +395,7 @@ export class FishBaseDataLoader {
     // Using traditional for-loop for performance with large dataset (35,731 rows × 102 columns)
     const rawRows: FishBaseSpeciesRow[] = [];
     for (let i = 0; i < arrowTable.numRows; i++) {
-      const row: any = {};
+      const row: Record<string, unknown> = {};
       for (let j = 0; j < arrowTable.numCols; j++) {
         const column = arrowTable.getChildAt(j);
         const fieldName = arrowTable.schema.fields[j].name;
@@ -440,7 +440,7 @@ export class FishBaseDataLoader {
     // Using traditional for-loop for performance with large dataset (330,105 rows × 35 columns)
     const rawRows: FishBaseCommonNameRow[] = [];
     for (let i = 0; i < arrowTable.numRows; i++) {
-      const row: any = {};
+      const row: Record<string, unknown> = {};
       for (let j = 0; j < arrowTable.numCols; j++) {
         const column = arrowTable.getChildAt(j);
         const fieldName = arrowTable.schema.fields[j].name;
