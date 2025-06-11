@@ -47,7 +47,7 @@ async function testImageIntegration() {
       method: 'tools/call',
       params: {
         name: 'search_fish_by_name',
-        arguments: { query: 'マグロ', limit: 1 },
+        arguments: { query: 'マグロ', limit: 1, includeImages: true },
       },
     };
     
