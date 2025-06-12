@@ -37,7 +37,7 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
       
       // 一般的なルール
-      'no-console': 'off',
+      'no-console': 'error', // MCP サーバーでは console 出力を禁止
       'prefer-const': 'error'
     }
   },
