@@ -1,11 +1,21 @@
 import { DatabaseManager } from '../src/database/db-manager.js';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 async function checkDatabaseStatus() {
   console.log('🔍 Checking Database Status');
   console.log('===========================\n');
 
   try {
-    const dbManager = new DatabaseManager('fish.db');
+    // Get the project root directory from the current module's location
+    const currentFileUrl = import.meta.url;
+    const currentFilePath = fileURLToPath(currentFileUrl);
+    const currentDir = dirname(currentFilePath);
+    // Navigate from tests/ to project root
+    const projectRoot = resolve(currentDir, '../');
+    const dbPath = resolve(projectRoot, 'fish.db');
+
+    const dbManager = new DatabaseManager(dbPath);
     dbManager.initialize();
     
     const stats = dbManager.getStats();

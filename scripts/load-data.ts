@@ -3,12 +3,22 @@
 import { DatabaseManager } from '../src/database/db-manager.js';
 import { DataImporter } from '../src/database/data-importer.js';
 import { FishBaseDataLoader } from '../src/services/data-loader.js';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 async function loadData() {
   console.log('🐟 Fish MCP Server - Data Loading Script');
   console.log('========================================\n');
 
-  const dbManager = new DatabaseManager('fish.db');
+  // Get the project root directory from the current module's location
+  const currentFileUrl = import.meta.url;
+  const currentFilePath = fileURLToPath(currentFileUrl);
+  const currentDir = dirname(currentFilePath);
+  // Navigate from scripts/ to project root
+  const projectRoot = resolve(currentDir, '../');
+  const dbPath = resolve(projectRoot, 'fish.db');
+
+  const dbManager = new DatabaseManager(dbPath);
   const dataImporter = new DataImporter(dbManager.getDatabase());
   const dataLoader = new FishBaseDataLoader();
 
