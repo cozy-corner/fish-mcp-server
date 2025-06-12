@@ -1,6 +1,8 @@
 import { FishBaseDataLoader } from '../src/services/data-loader.js';
 import { SearchService } from '../src/services/search-service.js';
 import { DatabaseManager } from '../src/database/db-manager.js';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 async function testSearch() {
   console.log('🐟 Fish MCP Server - 検索機能テスト');
@@ -9,7 +11,15 @@ async function testSearch() {
   try {
     // データベース初期化
     console.log('📦 データベース初期化中...');
-    const dbManager = new DatabaseManager('./fish.db');
+    // Get the project root directory from the current module's location
+    const currentFileUrl = import.meta.url;
+    const currentFilePath = fileURLToPath(currentFileUrl);
+    const currentDir = dirname(currentFilePath);
+    // Navigate from tests/ to project root
+    const projectRoot = resolve(currentDir, '../');
+    const dbPath = resolve(projectRoot, 'fish.db');
+
+    const dbManager = new DatabaseManager(dbPath);
     dbManager.initialize();
     
     // データ確認
