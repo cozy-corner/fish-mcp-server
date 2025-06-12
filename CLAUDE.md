@@ -42,9 +42,30 @@ Do not use these commands (Reason: Posts to PR body or overwrites existing comme
 
 ### Response Requirements (When User Instructs)
 1. **Reply to EVERY comment** user requests response to
-2. **Include commit IDs** for fixes: `Fixed in commit [abc123](link)`
-3. **Mark status clearly**: "Fixed", "Won't implement", "Acknowledged" (only when user specifies)
+2. **For fixes**: 
+   - Implement the fix
+   - Commit with descriptive message
+   - Push to remote branch
+   - Include commit IDs in reply: `Fixed in commit [abc123](link)`
+3. **For non-fixes**: Mark status clearly as "Won't implement" or "Acknowledged" (only when user specifies)
 4. **Use in_reply_to** for direct comment replies
+
+### Automatic Fix Workflow
+When user requests to fix a specific comment:
+
+Automatically perform:
+1. **Implement the fix** based on the CodeRabbit suggestion
+2. **Commit changes**: `git commit -m "descriptive message"`
+3. **Push to remote**: `git push`
+4. **Reply with commit ID**: 
+   ```bash
+   gh api repos/{owner}/{repo}/pulls/{pr_number}/comments --method POST \
+     --field body="Fixed in commit [commit_hash](commit_url). Description of fix." \
+     --field in_reply_to={comment_id}
+   ```
+5. **Handle errors**: If commit/push fails, report the issue to user
+
+This streamlines the fix-commit-push-reply cycle for faster review responses.
 
 ## Important Documentation
 - All critical procedures are documented directly in this file
