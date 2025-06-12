@@ -82,6 +82,12 @@ export class FishBaseDataLoader {
     }
   }
 
+  private async getPathAndFs() {
+    const path = await import('path');
+    const fs = await import('fs');
+    return { path, fs };
+  }
+
   async downloadParquetFile(filename: string): Promise<Buffer> {
     const url = `${FishBaseDataLoader.FISHBASE_S3_BASE}${filename}`;
     console.log(`Downloading ${filename} from FishBase...`);
@@ -384,8 +390,7 @@ export class FishBaseDataLoader {
 
     await this.ensureWasmInitialized();
 
-    const path = await import('path');
-    const fs = await import('fs');
+    const { path, fs } = await this.getPathAndFs();
     const filePath = path.join(process.cwd(), 'data', 'species.parquet');
 
     const buffer = fs.readFileSync(filePath);
@@ -416,8 +421,7 @@ export class FishBaseDataLoader {
 
     await this.ensureWasmInitialized();
 
-    const path = await import('path');
-    const fs = await import('fs');
+    const { path, fs } = await this.getPathAndFs();
     const filePath = path.join(process.cwd(), 'data', 'comnames.parquet');
 
     const buffer = fs.readFileSync(filePath);
