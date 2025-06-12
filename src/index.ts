@@ -4,7 +4,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { FishMCPServer } from './mcp/server.js';
 
-async function main() {
+async function main(): Promise<void> {
   const server = new Server(
     {
       name: 'fish-mcp-server',
@@ -24,7 +24,6 @@ async function main() {
   await server.connect(transport);
 }
 
-main().catch(error => {
-  console.error('Server error:', error);
+main().catch(() => {
   process.exit(1);
 });

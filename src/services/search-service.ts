@@ -323,11 +323,7 @@ export class SearchService {
             fish.scientificName
           );
           return { ...fish, images };
-        } catch (error) {
-          console.error(
-            `Failed to get images for ${fish.scientificName}:`,
-            error
-          );
+        } catch {
           return { ...fish, images: [] };
         }
       })

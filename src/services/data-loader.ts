@@ -93,7 +93,6 @@ export class FishBaseDataLoader {
 
   async downloadParquetFile(filename: string): Promise<Buffer> {
     const url = `${FishBaseDataLoader.FISHBASE_S3_BASE}${filename}`;
-    console.log(`Downloading ${filename} from FishBase...`);
 
     try {
       const response = await fetch(url);
@@ -104,25 +103,16 @@ export class FishBaseDataLoader {
       }
 
       const buffer = Buffer.from(await response.arrayBuffer());
-      console.log(
-        `Downloaded ${filename}: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`
-      );
       return buffer;
     } catch (error) {
-      console.warn(`Download failed for ${filename}, trying local file...`);
-
       // Fallback to local file
       const fs = await import('fs/promises');
       const path = await import('path');
 
       const localPath = path.join(process.cwd(), 'data', filename);
-      console.log(`Loading ${filename} from local file: ${localPath}`);
 
       try {
         const buffer = await fs.readFile(localPath);
-        console.log(
-          `Loaded local ${filename}: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`
-        );
         return buffer;
       } catch (localError) {
         throw new Error(
@@ -389,8 +379,6 @@ export class FishBaseDataLoader {
   }
 
   async loadSpeciesData(): Promise<Fish[]> {
-    console.log('Loading all species data from FishBase...');
-
     await this.ensureWasmInitialized();
 
     const { path, fs } = await this.getPathAndFs();
@@ -415,13 +403,10 @@ export class FishBaseDataLoader {
       rawRows.push(row as unknown as FishBaseSpeciesRow);
     }
 
-    console.log(`Loaded ${rawRows.length} species records`);
     return rawRows.map(row => this.transformSpeciesRow(row));
   }
 
   async loadCommonNames(): Promise<CommonName[]> {
-    console.log('Loading all common names from FishBase...');
-
     await this.ensureWasmInitialized();
 
     const { path, fs } = await this.getPathAndFs();
@@ -446,13 +431,8 @@ export class FishBaseDataLoader {
       rawRows.push(row as unknown as FishBaseCommonNameRow);
     }
 
-    console.log(`Loaded ${rawRows.length} common name records`);
-
     const filteredRows = rawRows.filter(
       row => row.Language === 'English' || row.Language === 'Japanese'
-    );
-    console.log(
-      `Filtered to ${filteredRows.length} English/Japanese records (${rawRows.length - filteredRows.length} other languages excluded)`
     );
 
     return filteredRows.map(row => ({
@@ -469,8 +449,6 @@ export class FishBaseDataLoader {
     japaneseNames: CommonName[];
     englishNames: CommonName[];
   }> {
-    console.log('Starting full fish database loading...');
-
     const [species, commonNames] = await Promise.all([
       this.loadSpeciesData(),
       this.loadCommonNames(),
@@ -481,15 +459,6 @@ export class FishBaseDataLoader {
     );
     const englishNames = commonNames.filter(
       name => name.language === 'English'
-    );
-
-    console.log(`Data summary:`);
-    console.log(`- Total species: ${species.length}`);
-    console.log(`- Total common names: ${commonNames.length}`);
-    console.log(`- Japanese names: ${japaneseNames.length}`);
-    console.log(`- English names: ${englishNames.length}`);
-    console.log(
-      `- Species with Japanese names: ${new Set(japaneseNames.map(n => n.specCode)).size}`
     );
 
     return {
