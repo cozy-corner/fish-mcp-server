@@ -65,6 +65,23 @@ export class FishBaseDataLoader {
     'https://fishbase.ropensci.org/data/';
   private static wasmInitialized = false;
 
+  private async ensureWasmInitialized(): Promise<void> {
+    if (!FishBaseDataLoader.wasmInitialized) {
+      const path = await import('path');
+      const fs = await import('fs');
+      const wasmPath = path.join(
+        process.cwd(),
+        'node_modules',
+        'parquet-wasm',
+        'esm',
+        'parquet_wasm_bg.wasm'
+      );
+      const wasmBuffer = fs.readFileSync(wasmPath);
+      await wasmInit(wasmBuffer);
+      FishBaseDataLoader.wasmInitialized = true;
+    }
+  }
+
   async downloadParquetFile(filename: string): Promise<Buffer> {
     const url = `${FishBaseDataLoader.FISHBASE_S3_BASE}${filename}`;
     console.log(`Downloading ${filename} from FishBase...`);
@@ -365,21 +382,7 @@ export class FishBaseDataLoader {
   async loadSpeciesData(): Promise<Fish[]> {
     console.log('Loading all species data from FishBase...');
 
-    // Initialize WASM if not already done
-    if (!FishBaseDataLoader.wasmInitialized) {
-      const path = await import('path');
-      const fs = await import('fs');
-      const wasmPath = path.join(
-        process.cwd(),
-        'node_modules',
-        'parquet-wasm',
-        'esm',
-        'parquet_wasm_bg.wasm'
-      );
-      const wasmBuffer = fs.readFileSync(wasmPath);
-      await wasmInit(wasmBuffer);
-      FishBaseDataLoader.wasmInitialized = true;
-    }
+    await this.ensureWasmInitialized();
 
     const path = await import('path');
     const fs = await import('fs');
@@ -410,25 +413,12 @@ export class FishBaseDataLoader {
 
   async loadCommonNames(): Promise<CommonName[]> {
     console.log('Loading all common names from FishBase...');
+
+    await this.ensureWasmInitialized();
+
     const path = await import('path');
     const fs = await import('fs');
     const filePath = path.join(process.cwd(), 'data', 'comnames.parquet');
-
-    // Initialize WASM if not already done
-    if (!FishBaseDataLoader.wasmInitialized) {
-      const path = await import('path');
-      const fs = await import('fs');
-      const wasmPath = path.join(
-        process.cwd(),
-        'node_modules',
-        'parquet-wasm',
-        'esm',
-        'parquet_wasm_bg.wasm'
-      );
-      const wasmBuffer = fs.readFileSync(wasmPath);
-      await wasmInit(wasmBuffer);
-      FishBaseDataLoader.wasmInitialized = true;
-    }
 
     const buffer = fs.readFileSync(filePath);
     const wasmTable = readParquet(new Uint8Array(buffer));
