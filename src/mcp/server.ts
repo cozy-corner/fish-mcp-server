@@ -7,7 +7,8 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { Fish, DangerLevel } from '../types/fish.js';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 export class FishMCPServer {
   private server: Server;
@@ -17,10 +18,14 @@ export class FishMCPServer {
   constructor(server: Server) {
     this.server = server;
 
-    // Use absolute path since cwd setting isn't working in Claude Desktop
-    const dbPath = resolve(
-      '/Users/sasakitakashinanji/code/fish-mcp-server/fish.db'
-    );
+    // Get the project root directory from the current module's location
+    const currentFileUrl = import.meta.url;
+    const currentFilePath = fileURLToPath(currentFileUrl);
+    const currentDir = dirname(currentFilePath);
+    // Navigate from src/mcp/ to project root
+    const projectRoot = resolve(currentDir, '../../');
+    const dbPath = resolve(projectRoot, 'fish.db');
+
     this.dbManager = new DatabaseManager(dbPath);
     this.dbManager.initialize();
     this.searchService = new SearchService(this.dbManager.getDatabase());
