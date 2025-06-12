@@ -82,7 +82,10 @@ export class FishBaseDataLoader {
     }
   }
 
-  private async getPathAndFs() {
+  private async getPathAndFs(): Promise<{
+    path: typeof import('path');
+    fs: typeof import('fs');
+  }> {
     const path = await import('path');
     const fs = await import('fs');
     return { path, fs };
