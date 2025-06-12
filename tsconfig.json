@@ -23,6 +23,6 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*", "*.d.ts"],
+  "include": ["src/**/*", "*.d.ts", "parquet-wasm.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
