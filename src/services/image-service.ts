@@ -42,7 +42,6 @@ export class ImageService {
         const observations = await this.searchINaturalist(scientificName);
 
         if (observations.length === 0) {
-          console.log(`No observations found for ${scientificName}`);
           return [];
         }
 
@@ -59,10 +58,8 @@ export class ImageService {
           }
         }
 
-        console.log(`No photos found in observations for ${scientificName}`);
         return [];
-      } catch (error) {
-        console.error(`Error fetching image for ${scientificName}:`, error);
+      } catch {
         return [];
       }
     });
@@ -85,7 +82,6 @@ export class ImageService {
     });
 
     const url = `${ImageService.INATURALIST_API_BASE}/observations?${params}`;
-    console.log(`Fetching from iNaturalist: ${url}`);
 
     const response = await fetch(url);
     if (!response.ok) {

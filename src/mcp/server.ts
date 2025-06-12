@@ -7,6 +7,7 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { Fish, DangerLevel } from '../types/fish.js';
+import { resolve } from 'path';
 
 export class FishMCPServer {
   private server: Server;
@@ -16,22 +17,13 @@ export class FishMCPServer {
   constructor(server: Server) {
     this.server = server;
 
-    try {
-      console.error('[FishMCPServer] Initializing database...');
-      this.dbManager = new DatabaseManager('fish.db');
-      this.dbManager.initialize();
-
-      const stats = this.dbManager.getStats();
-      console.error(
-        `[FishMCPServer] Database initialized with ${stats.fishCount} fish and ${stats.japaneseNameCount} Japanese names`
-      );
-
-      this.searchService = new SearchService(this.dbManager.getDatabase());
-      console.error('[FishMCPServer] Search service initialized');
-    } catch (error) {
-      console.error('[FishMCPServer] Failed to initialize:', error);
-      throw error;
-    }
+    // Use absolute path since cwd setting isn't working in Claude Desktop
+    const dbPath = resolve(
+      '/Users/sasakitakashinanji/code/fish-mcp-server/fish.db'
+    );
+    this.dbManager = new DatabaseManager(dbPath);
+    this.dbManager.initialize();
+    this.searchService = new SearchService(this.dbManager.getDatabase());
   }
 
   setupHandlers(): void {
@@ -50,13 +42,11 @@ export class FishMCPServer {
               throw new Error('検索クエリが指定されていません');
             }
 
-            console.error(`[FishMCPServer] Searching by name: "${query}"`);
             const results = await this.searchService.searchFishByName(
               query,
               args?.limit as number | undefined,
               args?.includeImages as boolean | undefined
             );
-            console.error(`[FishMCPServer] Found ${results.length} results`);
 
             return {
               content: [
@@ -70,13 +60,8 @@ export class FishMCPServer {
 
           case 'search_fish_by_features': {
             const options = args as Record<string, unknown>;
-            console.error(
-              `[FishMCPServer] Searching by features:`,
-              JSON.stringify(options)
-            );
             const results =
               await this.searchService.searchFishByFeatures(options);
-            console.error(`[FishMCPServer] Found ${results.length} results`);
 
             return {
               content: [
