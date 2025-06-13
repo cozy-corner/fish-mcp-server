@@ -58,13 +58,22 @@ Claude Desktopの設定ファイル（`~/.config/claude/claude_desktop_config.js
     "fish-mcp-server": {
       "command": "node",
       "args": ["/path/to/fish-mcp-server/dist/index.js"],
-      "cwd": "/path/to/fish-mcp-server"
+      "cwd": "/path/to/fish-mcp-server",
+      "env": {
+        "FISH_DB_PATH": "/path/to/fish-mcp-server/fish.db"
+      }
     }
   }
 }
 ```
 
 **注意**: `/path/to/fish-mcp-server`は実際のプロジェクトパスに置き換えてください。
+
+#### 環境変数による設定
+
+- **FISH_DB_PATH**: データベースファイルの絶対パスを指定（オプション）
+  - 設定しない場合は自動的にプロジェクトルートから`fish.db`を検索
+  - ビルド構造が変更された場合の安全策として使用可能
 
 ### 5. Claude Desktopの再起動
 
