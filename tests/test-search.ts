@@ -7,13 +7,14 @@ async function testSearch() {
   console.log('🐟 Fish MCP Server - 検索機能テスト');
   console.log('=====================================\n');
 
+  let dbManager: DatabaseManager | null = null;
   try {
     // データベース初期化
     console.log('📦 データベース初期化中...');
     // Use the shared path resolution helper
     const dbPath = getDbPath(import.meta.url);
 
-    const dbManager = new DatabaseManager(dbPath);
+    dbManager = new DatabaseManager(dbPath);
     dbManager.initialize();
     
     // データ確認
@@ -105,6 +106,10 @@ async function testSearch() {
     console.error('❌ エラー:', error);
     if (error instanceof Error) {
       console.error('スタックトレース:', error.stack);
+    }
+  } finally {
+    if (dbManager) {
+      dbManager.close();
     }
   }
 }

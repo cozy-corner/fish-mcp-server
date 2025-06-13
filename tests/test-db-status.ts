@@ -5,11 +5,12 @@ async function checkDatabaseStatus() {
   console.log('🔍 Checking Database Status');
   console.log('===========================\n');
 
+  let dbManager: DatabaseManager | null = null;
   try {
     // Use the shared path resolution helper
     const dbPath = getDbPath(import.meta.url);
 
-    const dbManager = new DatabaseManager(dbPath);
+    dbManager = new DatabaseManager(dbPath);
     dbManager.initialize();
     
     const stats = dbManager.getStats();
@@ -25,10 +26,12 @@ async function checkDatabaseStatus() {
     } else {
       console.log('\n✅ Database is populated and ready!');
     }
-    
-    dbManager.close();
   } catch (error) {
     console.error('❌ Error:', error);
+  } finally {
+    if (dbManager) {
+      dbManager.close();
+    }
   }
 }
 

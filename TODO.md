@@ -64,7 +64,7 @@
 - [x] FishBase全データ読み込み（35,731魚種 + 5,204日本語名）
 
 ## ドキュメント 📝
-- [ ] README.md作成
+- [x] README.md作成
 
 ## 追加実装項目 💡
 - [x] searchFishByFeatures関数のSQL修正（危険性検索エラー対応）
