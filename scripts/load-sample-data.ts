@@ -12,20 +12,14 @@ import {
   AquariumSuitability,
   BodyShape
 } from '../src/types/fish.js';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { getDbPath } from '../src/utils/paths.js';
 
 async function loadSampleData() {
   console.log('🐟 Loading Sample Data for Testing');
   console.log('==================================\n');
 
-  // Get the project root directory from the current module's location
-  const currentFileUrl = import.meta.url;
-  const currentFilePath = fileURLToPath(currentFileUrl);
-  const currentDir = dirname(currentFilePath);
-  // Navigate from scripts/ to project root
-  const projectRoot = resolve(currentDir, '../');
-  const dbPath = resolve(projectRoot, 'fish.db');
+  // Use the shared path resolution helper
+  const dbPath = getDbPath(import.meta.url);
 
   const dbManager = new DatabaseManager(dbPath);
   const dataImporter = new DataImporter(dbManager.getDatabase());
