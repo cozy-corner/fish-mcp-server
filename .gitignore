@@ -78,7 +78,6 @@ tmp/
 
 # Test files
 *.test.js
-*.test.ts
 test-output/
 
 # Backup files
