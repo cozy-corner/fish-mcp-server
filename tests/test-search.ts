@@ -1,15 +1,20 @@
 import { FishBaseDataLoader } from '../src/services/data-loader.js';
 import { SearchService } from '../src/services/search-service.js';
 import { DatabaseManager } from '../src/database/db-manager.js';
+import { getDbPath } from '../src/utils/paths.js';
 
 async function testSearch() {
   console.log('🐟 Fish MCP Server - 検索機能テスト');
   console.log('=====================================\n');
 
+  let dbManager: DatabaseManager | null = null;
   try {
     // データベース初期化
     console.log('📦 データベース初期化中...');
-    const dbManager = new DatabaseManager('./fish.db');
+    // Use the shared path resolution helper
+    const dbPath = getDbPath(import.meta.url);
+
+    dbManager = new DatabaseManager(dbPath);
     dbManager.initialize();
     
     // データ確認
@@ -101,6 +106,10 @@ async function testSearch() {
     console.error('❌ エラー:', error);
     if (error instanceof Error) {
       console.error('スタックトレース:', error.stack);
+    }
+  } finally {
+    if (dbManager) {
+      dbManager.close();
     }
   }
 }

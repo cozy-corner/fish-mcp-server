@@ -93,3 +93,49 @@ Available commands:
 **Workflow**:
 1. Development: `npm run check-all` (fixes issues automatically)
 2. Pre-commit: `npm run check-ci` (ensures CI compatibility)
+
+## ⚠️ CRITICAL: MCP Server Development Rules
+
+### Console Output Prohibition
+**NEVER add console.log, console.error, console.warn, or console.info to any source code files.**
+
+**Reason**: This is an MCP (Model Context Protocol) server that communicates with Claude Desktop via JSON-RPC over stdin/stdout. Any console output will contaminate the JSON communication stream and cause parsing errors.
+
+**Forbidden patterns**:
+```javascript
+console.log('Debug message');         // ❌ FORBIDDEN
+console.error('Error occurred');      // ❌ FORBIDDEN  
+console.warn('Warning message');      // ❌ FORBIDDEN
+console.info('Information');          // ❌ FORBIDDEN
+```
+
+**Error handling without console output**:
+```javascript
+// ✅ CORRECT - Silent error handling
+try {
+  riskyOperation();
+} catch (error) {
+  return defaultValue; // or throw error for critical failures
+}
+
+// ✅ CORRECT - Propagate critical errors
+try {
+  criticalOperation();
+} catch (error) {
+  throw new Error(`Operation failed: ${error.message}`);
+}
+```
+
+**Alternative debugging methods**:
+- Use file-based logging if debugging is absolutely necessary
+- Use conditional debug flags with file output
+- Test components in isolation outside the MCP context
+
+**Files that must never contain console output**:
+- `src/mcp/server.ts` (MCP server core)
+- `src/services/*.ts` (All service classes)
+- `src/database/*.ts` (Database components)
+- `src/index.ts` (Main entry point)
+- Any TypeScript file in the src/ directory
+
+This rule is enforced to maintain JSON-RPC protocol compatibility with Claude Desktop.

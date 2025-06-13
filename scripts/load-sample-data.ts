@@ -12,12 +12,16 @@ import {
   AquariumSuitability,
   BodyShape
 } from '../src/types/fish.js';
+import { getDbPath } from '../src/utils/paths.js';
 
 async function loadSampleData() {
   console.log('🐟 Loading Sample Data for Testing');
   console.log('==================================\n');
 
-  const dbManager = new DatabaseManager('fish.db');
+  // Use the shared path resolution helper
+  const dbPath = getDbPath(import.meta.url);
+
+  const dbManager = new DatabaseManager(dbPath);
   const dataImporter = new DataImporter(dbManager.getDatabase());
 
   try {

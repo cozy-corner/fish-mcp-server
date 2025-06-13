@@ -33,8 +33,6 @@ export class DatabaseManager {
   initialize(): void {
     if (this.isInitialized) return;
 
-    console.log('Initializing database schema...');
-
     try {
       const schemaPath = join(__dirname, 'schema.sql');
       const schema = readFileSync(schemaPath, 'utf-8');
@@ -44,18 +42,14 @@ export class DatabaseManager {
       throw new Error(`Failed to initialize database schema: ${error}`);
     }
 
-    console.log('Database schema initialized successfully');
     this.isInitialized = true;
   }
 
   optimizeDatabase(): void {
-    console.log('Optimizing database...');
     try {
       this.db.exec('ANALYZE');
       this.db.exec('PRAGMA optimize');
-      console.log('Database optimization completed');
     } catch (error) {
-      console.error('Database optimization failed:', error);
       throw new Error(`Database optimization failed: ${error}`);
     }
   }
@@ -102,8 +96,8 @@ export class DatabaseManager {
   close(): void {
     try {
       this.db.close();
-    } catch (error) {
-      console.error('Error closing database:', error);
+    } catch {
+      // Error closing database, continue silently
     }
   }
 }

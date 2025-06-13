@@ -7,6 +7,10 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { Fish, DangerLevel } from '../types/fish.js';
+import { getDbPath } from '../utils/paths.js';
+import createDebug from 'debug';
+
+const debug = createDebug('fish-mcp:server');
 
 export class FishMCPServer {
   private server: Server;
@@ -16,22 +20,20 @@ export class FishMCPServer {
   constructor(server: Server) {
     this.server = server;
 
-    try {
-      console.error('[FishMCPServer] Initializing database...');
-      this.dbManager = new DatabaseManager('fish.db');
-      this.dbManager.initialize();
+    // Allow explicit override while retaining auto-detection fallback
+    const dbPath = process.env.FISH_DB_PATH ?? getDbPath(import.meta.url);
 
-      const stats = this.dbManager.getStats();
-      console.error(
-        `[FishMCPServer] Database initialized with ${stats.fishCount} fish and ${stats.japaneseNameCount} Japanese names`
-      );
+    debug(
+      'Database path resolution: %s (env override: %s)',
+      dbPath,
+      process.env.FISH_DB_PATH ? 'yes' : 'no'
+    );
 
-      this.searchService = new SearchService(this.dbManager.getDatabase());
-      console.error('[FishMCPServer] Search service initialized');
-    } catch (error) {
-      console.error('[FishMCPServer] Failed to initialize:', error);
-      throw error;
-    }
+    this.dbManager = new DatabaseManager(dbPath);
+    this.dbManager.initialize();
+    this.searchService = new SearchService(this.dbManager.getDatabase());
+
+    debug('FishMCPServer initialized successfully');
   }
 
   setupHandlers(): void {
@@ -50,13 +52,11 @@ export class FishMCPServer {
               throw new Error('検索クエリが指定されていません');
             }
 
-            console.error(`[FishMCPServer] Searching by name: "${query}"`);
             const results = await this.searchService.searchFishByName(
               query,
               args?.limit as number | undefined,
               args?.includeImages as boolean | undefined
             );
-            console.error(`[FishMCPServer] Found ${results.length} results`);
 
             return {
               content: [
@@ -70,13 +70,8 @@ export class FishMCPServer {
 
           case 'search_fish_by_features': {
             const options = args as Record<string, unknown>;
-            console.error(
-              `[FishMCPServer] Searching by features:`,
-              JSON.stringify(options)
-            );
             const results =
               await this.searchService.searchFishByFeatures(options);
-            console.error(`[FishMCPServer] Found ${results.length} results`);
 
             return {
               content: [
