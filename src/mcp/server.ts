@@ -7,8 +7,7 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { Fish, DangerLevel } from '../types/fish.js';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { getDbPath } from '../utils/paths.js';
 
 export class FishMCPServer {
   private server: Server;
@@ -18,13 +17,8 @@ export class FishMCPServer {
   constructor(server: Server) {
     this.server = server;
 
-    // Get the project root directory from the current module's location
-    const currentFileUrl = import.meta.url;
-    const currentFilePath = fileURLToPath(currentFileUrl);
-    const currentDir = dirname(currentFilePath);
-    // Navigate from src/mcp/ to project root
-    const projectRoot = resolve(currentDir, '../../');
-    const dbPath = resolve(projectRoot, 'fish.db');
+    // Use the shared path resolution helper
+    const dbPath = getDbPath(import.meta.url);
 
     this.dbManager = new DatabaseManager(dbPath);
     this.dbManager.initialize();
