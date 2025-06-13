@@ -15,6 +15,9 @@ import {
 import { CommonName } from './data-loader.js';
 import { cm, g, m } from '../types/units.js';
 import { ImageService } from './image-service.js';
+import createDebug from 'debug';
+
+const debug = createDebug('fish-mcp:search-service');
 
 export interface SearchFeatures {
   minLength?: number;
@@ -323,7 +326,12 @@ export class SearchService {
             fish.scientificName
           );
           return { ...fish, images };
-        } catch {
+        } catch (error) {
+          debug(
+            'Failed to fetch images for %s: %O',
+            fish.scientificName,
+            error
+          );
           return { ...fish, images: [] };
         }
       })

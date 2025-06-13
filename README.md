@@ -251,6 +251,19 @@ src/
 - iNaturalist APIの制限により、一部の魚種では画像が取得できない場合があります
 - 学名が不正確な場合、画像検索に失敗することがあります
 
+### デバッグログの有効化
+
+画像取得や検索の詳細ログを確認したい場合：
+
+```bash
+# 全てのデバッグログを有効化
+DEBUG=fish-mcp:* npm run dev
+
+# 特定のモジュールのみ
+DEBUG=fish-mcp:image-service npm run dev
+DEBUG=fish-mcp:search-service npm run dev
+```
+
 ## ライセンス
 
 ISC License
