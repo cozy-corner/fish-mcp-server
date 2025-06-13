@@ -24,6 +24,15 @@ async function main(): Promise<void> {
   await server.connect(transport);
 }
 
-main().catch(() => {
+main().catch(error => {
+  if (error instanceof Error) {
+    // Use stderr for error output to avoid JSON-RPC contamination
+    process.stderr.write(`Error: ${error.message}\n`);
+    if (error.stack) {
+      process.stderr.write(`Stack trace: ${error.stack}\n`);
+    }
+  } else {
+    process.stderr.write(`Unknown error: ${String(error)}\n`);
+  }
   process.exit(1);
 });
