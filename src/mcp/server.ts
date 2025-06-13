@@ -8,6 +8,9 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { Fish, DangerLevel } from '../types/fish.js';
 import { getDbPath } from '../utils/paths.js';
+import createDebug from 'debug';
+
+const debug = createDebug('fish-mcp:server');
 
 export class FishMCPServer {
   private server: Server;
@@ -17,12 +20,20 @@ export class FishMCPServer {
   constructor(server: Server) {
     this.server = server;
 
-    // Use the shared path resolution helper
-    const dbPath = getDbPath(import.meta.url);
+    // Allow explicit override while retaining auto-detection fallback
+    const dbPath = process.env.FISH_DB_PATH ?? getDbPath(import.meta.url);
+
+    debug(
+      'Database path resolution: %s (env override: %s)',
+      dbPath,
+      process.env.FISH_DB_PATH ? 'yes' : 'no'
+    );
 
     this.dbManager = new DatabaseManager(dbPath);
     this.dbManager.initialize();
     this.searchService = new SearchService(this.dbManager.getDatabase());
+
+    debug('FishMCPServer initialized successfully');
   }
 
   setupHandlers(): void {
