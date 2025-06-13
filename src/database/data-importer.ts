@@ -10,8 +10,6 @@ export class DataImporter {
   }
 
   insertFish(fish: Fish[]): void {
-    console.log(`Inserting ${fish.length} fish species...`);
-
     const insertFish = this.db.prepare(`
       INSERT OR REPLACE INTO fish (
         spec_code, genus, species, scientific_name, author, fb_name, fam_code, family,
@@ -69,12 +67,9 @@ export class DataImporter {
     });
 
     insertMany(fish);
-    console.log(`Inserted ${fish.length} fish species successfully`);
   }
 
   insertCommonNames(commonNames: CommonName[]): void {
-    console.log(`Inserting ${commonNames.length} common names...`);
-
     const insertName = this.db.prepare(`
       INSERT OR REPLACE INTO common_names (com_name, spec_code, language, preferred_name)
       VALUES (?, ?, ?, ?)
@@ -92,12 +87,9 @@ export class DataImporter {
     });
 
     insertMany(commonNames);
-    console.log(`Inserted ${commonNames.length} common names successfully`);
   }
 
   buildFTSIndex(): void {
-    console.log('Building FTS5 search indexes...');
-
     this.db.exec(`
       INSERT INTO fish_search(scientific_name, fb_name, comments, remarks, japanese_names, english_names)
       SELECT 
@@ -114,7 +106,5 @@ export class DataImporter {
       INSERT INTO name_search(com_name, language)
       SELECT com_name, language FROM common_names;
     `);
-
-    console.log('FTS5 indexes built successfully');
   }
 }

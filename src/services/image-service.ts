@@ -1,5 +1,8 @@
 // Using Node.js built-in fetch API (Node 18+)
 import type { FishImage } from '../types/fish.js';
+import createDebug from 'debug';
+
+const debug = createDebug('fish-mcp:image-service');
 
 interface INaturalistObservation {
   id: number;
@@ -32,6 +35,8 @@ export class ImageService {
    * @returns 画像情報の配列、画像が見つからない場合は空配列
    */
   async getImagesForFish(scientificName: string): Promise<FishImage[]> {
+    debug('Fetching images for scientific name: %s', scientificName);
+
     // Promise queueを使用して並行リクエストを直列化
     const result = this.requestQueue.then(async (): Promise<FishImage[]> => {
       try {
@@ -42,7 +47,7 @@ export class ImageService {
         const observations = await this.searchINaturalist(scientificName);
 
         if (observations.length === 0) {
-          console.log(`No observations found for ${scientificName}`);
+          debug('No observations found for %s', scientificName);
           return [];
         }
 
@@ -50,6 +55,7 @@ export class ImageService {
         for (const observation of observations) {
           if (observation.photos && observation.photos.length > 0) {
             const photo = observation.photos[0];
+            debug('Found image for %s: %s', scientificName, photo.url);
             return [
               {
                 url: this.getHighQualityImageUrl(photo.url),
@@ -59,10 +65,10 @@ export class ImageService {
           }
         }
 
-        console.log(`No photos found in observations for ${scientificName}`);
+        debug('No photos found in observations for %s', scientificName);
         return [];
       } catch (error) {
-        console.error(`Error fetching image for ${scientificName}:`, error);
+        debug('Error fetching images for %s: %O', scientificName, error);
         return [];
       }
     });
@@ -85,7 +91,6 @@ export class ImageService {
     });
 
     const url = `${ImageService.INATURALIST_API_BASE}/observations?${params}`;
-    console.log(`Fetching from iNaturalist: ${url}`);
 
     const response = await fetch(url);
     if (!response.ok) {

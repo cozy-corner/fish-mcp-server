@@ -1,11 +1,16 @@
 import { DatabaseManager } from '../src/database/db-manager.js';
+import { getDbPath } from '../src/utils/paths.js';
 
 async function checkDatabaseStatus() {
   console.log('🔍 Checking Database Status');
   console.log('===========================\n');
 
+  let dbManager: DatabaseManager | null = null;
   try {
-    const dbManager = new DatabaseManager('fish.db');
+    // Use the shared path resolution helper
+    const dbPath = getDbPath(import.meta.url);
+
+    dbManager = new DatabaseManager(dbPath);
     dbManager.initialize();
     
     const stats = dbManager.getStats();
@@ -21,10 +26,12 @@ async function checkDatabaseStatus() {
     } else {
       console.log('\n✅ Database is populated and ready!');
     }
-    
-    dbManager.close();
   } catch (error) {
     console.error('❌ Error:', error);
+  } finally {
+    if (dbManager) {
+      dbManager.close();
+    }
   }
 }
 

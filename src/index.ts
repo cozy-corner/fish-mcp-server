@@ -4,7 +4,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { FishMCPServer } from './mcp/server.js';
 
-async function main() {
+async function main(): Promise<void> {
   const server = new Server(
     {
       name: 'fish-mcp-server',
@@ -25,6 +25,14 @@ async function main() {
 }
 
 main().catch(error => {
-  console.error('Server error:', error);
+  if (error instanceof Error) {
+    // Use stderr for error output to avoid JSON-RPC contamination
+    process.stderr.write(`Error: ${error.message}\n`);
+    if (error.stack) {
+      process.stderr.write(`Stack trace: ${error.stack}\n`);
+    }
+  } else {
+    process.stderr.write(`Unknown error: ${String(error)}\n`);
+  }
   process.exit(1);
 });

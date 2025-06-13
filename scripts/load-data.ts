@@ -3,12 +3,16 @@
 import { DatabaseManager } from '../src/database/db-manager.js';
 import { DataImporter } from '../src/database/data-importer.js';
 import { FishBaseDataLoader } from '../src/services/data-loader.js';
+import { getDbPath } from '../src/utils/paths.js';
 
 async function loadData() {
   console.log('🐟 Fish MCP Server - Data Loading Script');
   console.log('========================================\n');
 
-  const dbManager = new DatabaseManager('fish.db');
+  // Use the shared path resolution helper
+  const dbPath = getDbPath(import.meta.url);
+
+  const dbManager = new DatabaseManager(dbPath);
   const dataImporter = new DataImporter(dbManager.getDatabase());
   const dataLoader = new FishBaseDataLoader();
 
