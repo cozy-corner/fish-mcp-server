@@ -32,6 +32,8 @@ jobs:
     - name: Run TypeScript type check
       run: npm run typecheck
 
-    - name: Run tests (when available)
+    - name: Run tests
       run: npm test
-      continue-on-error: true  # Tests not implemented yet
+
+    - name: Build project
+      run: npm run build

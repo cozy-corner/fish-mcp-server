@@ -175,7 +175,7 @@ export class SearchService {
       SELECT f.*, 'fts_search' as match_type, NULL as matched_name
       FROM fish f
       JOIN fish_search fs ON f.spec_code = fs.rowid
-      WHERE fish_search MATCH ?
+      WHERE fish_search MATCH ? -- Note: FTS5 requires table name, not alias 'fs'
       ORDER BY rank
       LIMIT ?
     `
@@ -194,7 +194,7 @@ export class SearchService {
         SELECT f.*, 'fts_search' as match_type, NULL as matched_name
         FROM fish f
         JOIN fish_search fs ON f.spec_code = fs.rowid
-        WHERE fs MATCH ?
+        WHERE fish_search MATCH ? -- Note: FTS5 requires table name, not alias 'fs'
         ORDER BY rank
         LIMIT ?
       `

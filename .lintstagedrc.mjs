@@ -4,6 +4,7 @@ export default {
     'prettier --write',
     'git add',
     'eslint --max-warnings=0',
-    () => 'tsc --noEmit'
+    () => 'tsc --noEmit',
+    () => 'npm test'
   ]
 };
