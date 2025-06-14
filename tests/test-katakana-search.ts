@@ -1,4 +1,4 @@
-import { describe, it } from 'node:test';
+import { describe, it, after } from 'node:test';
 import { strict as assert } from 'node:assert';
 import Database from 'better-sqlite3';
 import { SearchService } from '../src/services/search-service.js';
@@ -10,6 +10,8 @@ describe('Katakana Search', () => {
   const db = new Database(dbPath, { readonly: true });
   const imageService = new ImageService();
   const searchService = new SearchService(db, imageService);
+
+  after(() => db.close());
 
   it('should find fish with katakana input "サバ"', async () => {
     const results = await searchService.searchFishByName('サバ', 10);
