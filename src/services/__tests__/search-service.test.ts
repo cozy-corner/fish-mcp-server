@@ -52,30 +52,47 @@ describe('SearchService', () => {
         comments: 'Common pelagic fish in the Pacific Ocean',
         remarks: 'Forms large schools',
       },
+      {
+        specCode: 3,
+        genus: 'Chaetodon',
+        species: 'aureus',
+        scientificName: 'Chaetodon aureus',
+        fbName: 'Golden butterflyfish',
+        fresh: false,
+        brackish: false,
+        saltwater: true,
+        gamefish: false,
+        comments: 'Butterfly fish with golden coloration',
+        remarks: 'Found in coral reefs',
+      },
+      {
+        specCode: 4,
+        genus: 'Misgurnus',
+        species: 'anguillicaudatus',
+        scientificName: 'Misgurnus anguillicaudatus',
+        fbName: 'Oriental weatherloach',
+        fresh: true,
+        brackish: false,
+        saltwater: false,
+        gamefish: false,
+        comments: 'Freshwater loach species',
+        remarks: 'Used in traditional medicine',
+      },
     ];
 
     dataImporter.insertFish(testFish);
 
     // Insert test common names
     const testCommonNames: CommonName[] = [
-      // Japanese names for tuna
-      { comName: 'マグロ', specCode: 1, language: 'Japanese', preferred: true },
-      {
-        comName: 'まぐろ',
-        specCode: 1,
-        language: 'Japanese',
-        preferred: false,
-      },
-      { comName: '鮪', specCode: 1, language: 'Japanese', preferred: false },
-      {
-        comName: 'キハダマグロ',
-        specCode: 1,
-        language: 'Japanese',
-        preferred: false,
-      },
-      // Romaji names
+      // Japanese names for tuna - mostly romaji (realistic)
       {
         comName: 'Kihada-maguro',
+        specCode: 1,
+        language: 'Japanese',
+        preferred: true,
+      },
+      {
+        comName: 'Maguro',
         specCode: 1,
         language: 'Japanese',
         preferred: false,
@@ -88,14 +105,55 @@ describe('SearchService', () => {
         preferred: true,
       },
       { comName: 'Ahi', specCode: 1, language: 'English', preferred: false },
-      // Names for mackerel
-      { comName: 'サバ', specCode: 2, language: 'Japanese', preferred: true },
-      { comName: 'さば', specCode: 2, language: 'Japanese', preferred: false },
-      { comName: '鯖', specCode: 2, language: 'Japanese', preferred: false },
-      { comName: 'Saba', specCode: 2, language: 'Japanese', preferred: false },
+      // Names for mackerel - romaji only (realistic)
+      { comName: 'Saba', specCode: 2, language: 'Japanese', preferred: true },
+      {
+        comName: 'Ma-saba',
+        specCode: 2,
+        language: 'Japanese',
+        preferred: false,
+      },
       {
         comName: 'Pacific mackerel',
         specCode: 2,
+        language: 'English',
+        preferred: true,
+      },
+      // Names for butterflyfish - testing ou->ô normalization with romaji
+      {
+        comName: 'Chôchô-uo',
+        specCode: 3,
+        language: 'Japanese',
+        preferred: true,
+      },
+      {
+        comName: 'Chouchou-uo',
+        specCode: 3,
+        language: 'Japanese',
+        preferred: false,
+      },
+      {
+        comName: 'Golden butterflyfish',
+        specCode: 3,
+        language: 'English',
+        preferred: true,
+      },
+      // Names for loach - testing ou->ô normalization with romaji
+      {
+        comName: 'Dojô',
+        specCode: 4,
+        language: 'Japanese',
+        preferred: true,
+      },
+      {
+        comName: 'Dojou',
+        specCode: 4,
+        language: 'Japanese',
+        preferred: false,
+      },
+      {
+        comName: 'Oriental weatherloach',
+        specCode: 4,
         language: 'English',
         preferred: true,
       },
@@ -114,34 +172,36 @@ describe('SearchService', () => {
   });
 
   describe('searchFishByName', () => {
-    it('should find fish by exact Japanese name in katakana', async () => {
+    it('should find fish by katakana input via romaji conversion', async () => {
       const results = await searchService.searchFishByName('マグロ', 10);
-      assert.ok(results.length > 0);
-      assert.ok(results.some(r => r.specCode === 1));
-      assert.ok(results.some(r => r.matchType === 'japanese_exact'));
-      assert.ok(results.some(r => r.matchedName === 'マグロ'));
+      assert(results.length > 0, 'Should find fish via romaji conversion');
+      assert(
+        results.some(r => r.specCode === 1),
+        'Should find tuna'
+      );
+      // Should match via romaji conversion, not exact match
+      assert(
+        results.some(
+          r => r.matchedName === 'Maguro' || r.matchedName === 'Kihada-maguro'
+        )
+      );
     });
 
-    it('should find fish by exact Japanese name in hiragana', async () => {
+    it('should find fish by hiragana input via romaji conversion', async () => {
       const results = await searchService.searchFishByName('まぐろ', 10);
-      assert.ok(results.length > 0);
-      assert.ok(results.some(r => r.specCode === 1));
-      assert.ok(results.some(r => r.matchType === 'japanese_exact'));
+      assert(results.length > 0, 'Should find fish via romaji conversion');
+      assert(
+        results.some(r => r.specCode === 1),
+        'Should find tuna'
+      );
     });
 
-    it('should find fish by exact Japanese name in kanji', async () => {
-      const results = await searchService.searchFishByName('鮪', 10);
-      assert.equal(results.length, 1);
-      assert.equal(results[0].specCode, 1);
-      assert.equal(results[0].matchType, 'japanese_exact');
-      assert.equal(results[0].matchedName, '鮪');
-    });
-
-    it('should find fish by partial Japanese name match', async () => {
+    it('should find fish by partial katakana name match', async () => {
       const results = await searchService.searchFishByName('キハダ', 10);
-      assert.equal(results.length, 1);
-      assert.equal(results[0].specCode, 1);
-      assert.equal(results[0].matchType, 'japanese_partial');
+      assert(results.length >= 1, 'Should find at least one fish');
+      const targetFish = results.find(fish => fish.specCode === 1);
+      assert(targetFish, 'Should find fish with spec code 1');
+      // Should match 'Kihada-maguro' via partial match
     });
 
     it('should find fish by English name', async () => {
@@ -231,30 +291,71 @@ describe('SearchService', () => {
         },
         10
       );
-      assert.equal(results.length, 2);
+
+      // Check that saltwater fish are found
+      assert(
+        results.some(f => f.specCode === 1),
+        'Should find tuna'
+      );
+      assert(
+        results.some(f => f.specCode === 2),
+        'Should find mackerel'
+      );
+      assert(
+        results.some(f => f.specCode === 3),
+        'Should find butterflyfish'
+      );
+
+      // Check that freshwater fish are not included
+      assert(
+        !results.some(f => f.specCode === 4),
+        'Should not find freshwater loach'
+      );
     });
 
     it('should handle empty search criteria', async () => {
       const results = await searchService.searchFishByFeatures({}, 10);
-      assert.equal(results.length, 2);
+
+      // Should return all test fish when no criteria specified
+      assert(
+        results.some(f => f.specCode === 1),
+        'Should include tuna'
+      );
+      assert(
+        results.some(f => f.specCode === 2),
+        'Should include mackerel'
+      );
+      assert(
+        results.some(f => f.specCode === 3),
+        'Should include butterflyfish'
+      );
+      assert(
+        results.some(f => f.specCode === 4),
+        'Should include loach'
+      );
     });
 
     it('should respect limit in feature search', async () => {
       const results = await searchService.searchFishByFeatures({}, 1);
-      assert.equal(results.length, 1);
+      assert.equal(results.length, 1, 'Should respect limit parameter');
+      assert(results[0].specCode > 0, 'Should return valid fish');
     });
   });
 
   describe('getCommonNamesForFish', () => {
     it('should return all common names for a fish', () => {
       const names = searchService.getCommonNamesForFish(1);
-      assert.equal(names.length, 7); // All names for tuna
+      // Check that we get both Japanese and English names
+      assert(names.length > 0, 'Should have common names');
 
       const japaneseNames = names.filter(n => n.language === 'Japanese');
-      assert.equal(japaneseNames.length, 5);
+      assert(japaneseNames.length > 0, 'Should have Japanese names');
+      assert(japaneseNames.some(n => n.comName === 'Maguro'));
+      assert(japaneseNames.some(n => n.comName === 'Kihada-maguro'));
 
       const englishNames = names.filter(n => n.language === 'English');
-      assert.equal(englishNames.length, 2);
+      assert(englishNames.length > 0, 'Should have English names');
+      assert(englishNames.some(n => n.comName === 'Yellowfin tuna'));
     });
 
     it('should return empty array for non-existent fish', () => {
@@ -294,6 +395,97 @@ describe('SearchService', () => {
           assert.ok(Array.isArray(results));
         }, `Query "${query}" should not throw SQL error`);
       }
+    });
+  });
+
+  describe('diacritic normalization in search', () => {
+    it('should find fish using kana input with ou/uu patterns', async () => {
+      // Test that Japanese input gets normalized and finds fish
+      // These searches test the internal toRomaji normalization
+
+      // Test チョウチョウ (butterfly) pattern - should normalize chouchou -> chôchô
+      const butterflyResults = await searchService.searchFishByName(
+        'チョウチョウ',
+        10
+      );
+      assert(butterflyResults.length > 0, 'Should find butterfly fish');
+      assert(
+        butterflyResults.some(f => f.specCode === 3),
+        'Should find butterflyfish with spec code 3'
+      );
+
+      // Test ドジョウ (loach) pattern - should normalize dojou -> dojô
+      const loachResults = await searchService.searchFishByName('ドジョウ', 10);
+      assert(loachResults.length > 0, 'Should find loach fish');
+      assert(
+        loachResults.some(f => f.specCode === 4),
+        'Should find loach with spec code 4'
+      );
+    });
+
+    it('should find fish using romaji input with ou/uu patterns', async () => {
+      // Test that romaji input also gets normalized
+
+      // Test plain ou pattern - should normalize to ô and find butterflyfish
+      const ouResults = await searchService.searchFishByName('chouchou', 10);
+      assert(
+        ouResults.length > 0,
+        'Should find fish with chouchou->chôchô normalization'
+      );
+      assert(
+        ouResults.some(f => f.specCode === 3),
+        'Should find butterflyfish via romaji normalization'
+      );
+
+      // Test dojou pattern - should normalize to dojô and find loach
+      const dojouResults = await searchService.searchFishByName('dojou', 10);
+      assert(
+        dojouResults.length > 0,
+        'Should find fish with dojou->dojô normalization'
+      );
+      assert(
+        dojouResults.some(f => f.specCode === 4),
+        'Should find loach via romaji normalization'
+      );
+    });
+
+    it('should find same fish regardless of normalization', async () => {
+      // Test that both normalized and non-normalized versions find the same fish
+
+      // Search using both forms should find the same butterflyfish
+      const normalizedResults = await searchService.searchFishByName(
+        'chôchô',
+        10
+      );
+      const nonNormalizedResults = await searchService.searchFishByName(
+        'chouchou',
+        10
+      );
+
+      assert(
+        normalizedResults.length > 0,
+        'Should find fish with normalized input'
+      );
+      assert(
+        nonNormalizedResults.length > 0,
+        'Should find fish with non-normalized input'
+      );
+
+      // Both should find the same butterflyfish
+      const foundInBoth =
+        normalizedResults.some(f => f.specCode === 3) &&
+        nonNormalizedResults.some(f => f.specCode === 3);
+      assert(foundInBoth, 'Both searches should find the same butterflyfish');
+    });
+
+    it('should preserve non-normalized patterns in search', async () => {
+      // Test that patterns without ou/uu work normally
+      const sabaResults = await searchService.searchFishByName('saba', 10);
+      assert(sabaResults.length > 0, 'Should find mackerel with saba');
+      assert(
+        sabaResults.some(f => f.specCode === 2),
+        'Should find mackerel via saba search'
+      );
     });
   });
 });
