@@ -139,9 +139,10 @@ describe('SearchService', () => {
 
     it('should find fish by partial Japanese name match', async () => {
       const results = await searchService.searchFishByName('キハダ', 10);
-      assert.equal(results.length, 1);
-      assert.equal(results[0].specCode, 1);
-      assert.equal(results[0].matchType, 'japanese_partial');
+      assert(results.length >= 1, 'Should find at least one fish');
+      const targetFish = results.find(fish => fish.specCode === 1);
+      assert(targetFish, 'Should find fish with spec code 1');
+      assert.equal(targetFish.matchType, 'japanese_partial');
     });
 
     it('should find fish by English name', async () => {

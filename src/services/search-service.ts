@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import * as wanakana from 'wanakana';
 import {
   Fish,
   HabitatZone,
@@ -81,20 +82,9 @@ export class SearchService {
     this.imageService = imageService || new ImageService();
   }
 
-  // ひらがなをカタカナに変換
-  private toKatakana(str: string): string {
-    return str.replace(/[\u3041-\u3096]/g, match => {
-      const chr = match.charCodeAt(0) + 0x60;
-      return String.fromCharCode(chr);
-    });
-  }
-
-  // カタカナをひらがなに変換
-  private toHiragana(str: string): string {
-    return str.replace(/[\u30a1-\u30f6]/g, match => {
-      const chr = match.charCodeAt(0) - 0x60;
-      return String.fromCharCode(chr);
-    });
+  // カタカナ・ひらがなをローマ字に変換
+  private toRomaji(str: string): string {
+    return wanakana.toRomaji(str).toLowerCase();
   }
 
   async searchFishByName(
@@ -103,22 +93,21 @@ export class SearchService {
     includeImages: boolean = false
   ): Promise<FishWithMatch[]> {
     // クエリの前処理
-    const katakanaQuery = this.toKatakana(query);
-    const hiraganaQuery = this.toHiragana(query);
+    const romajiQuery = this.toRomaji(query);
 
-    // 1. Japanese name exact match (original, katakana, hiragana)
+    // 1. Japanese name exact match (original and romaji)
     let results = this.db
       .prepare(
         `
       SELECT f.*, 'japanese_exact' as match_type, cn.com_name as matched_name
       FROM fish f
       JOIN common_names cn ON f.spec_code = cn.spec_code
-      WHERE cn.language = 'Japanese' AND cn.com_name IN (?, ?, ?)
+      WHERE cn.language = 'Japanese' AND cn.com_name IN (?, ?)
       ORDER BY cn.preferred_name DESC
       LIMIT ?
     `
       )
-      .all(query, katakanaQuery, hiraganaQuery, limit) as FishDbRow[];
+      .all(query, romajiQuery, limit) as FishDbRow[];
 
     if (results.length > 0) {
       return includeImages
@@ -126,7 +115,7 @@ export class SearchService {
         : this.transformDbRowsToFish(results);
     }
 
-    // 2. Japanese name partial match (including katakana/hiragana variants)
+    // 2. Japanese name partial match (including romaji)
     results = this.db
       .prepare(
         `
@@ -134,18 +123,13 @@ export class SearchService {
       FROM fish f
       JOIN common_names cn ON f.spec_code = cn.spec_code
       WHERE cn.language = 'Japanese' AND (
-        cn.com_name LIKE ? OR cn.com_name LIKE ? OR cn.com_name LIKE ?
+        cn.com_name LIKE ? OR cn.com_name LIKE ?
       )
       ORDER BY cn.preferred_name DESC, cn.com_name
       LIMIT ?
     `
       )
-      .all(
-        `%${query}%`,
-        `%${katakanaQuery}%`,
-        `%${hiraganaQuery}%`,
-        limit
-      ) as FishDbRow[];
+      .all(`%${query}%`, `%${romajiQuery}%`, limit) as FishDbRow[];
 
     if (results.length > 0) {
       return this.transformDbRowsToFishWithImages(results);
@@ -167,8 +151,8 @@ export class SearchService {
       return this.transformDbRowsToFishWithImages(results);
     }
 
-    // 4. FTS5 search (try both original and katakana for better results)
-    // First try katakana version (better for single words)
+    // 4. FTS5 search (try both original and romaji for better results)
+    // First try romaji version (for Japanese input)
     results = this.db
       .prepare(
         `
@@ -180,14 +164,14 @@ export class SearchService {
       LIMIT ?
     `
       )
-      .all(katakanaQuery, limit) as FishDbRow[];
+      .all(romajiQuery, limit) as FishDbRow[];
 
     if (results.length > 0) {
       return this.transformDbRowsToFishWithImages(results);
     }
 
-    // Then try original query (for English or already katakana)
-    if (query !== katakanaQuery) {
+    // Then try original query (for English or already romaji)
+    if (query !== romajiQuery) {
       results = this.db
         .prepare(
           `
