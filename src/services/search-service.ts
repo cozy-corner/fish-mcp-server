@@ -132,7 +132,9 @@ export class SearchService {
       .all(`%${query}%`, `%${romajiQuery}%`, limit) as FishDbRow[];
 
     if (results.length > 0) {
-      return this.transformDbRowsToFishWithImages(results);
+      return includeImages
+        ? this.transformDbRowsToFishWithImages(results)
+        : this.transformDbRowsToFish(results);
     }
 
     // 3. Comments/Remarks partial match (for descriptive queries)
@@ -148,7 +150,9 @@ export class SearchService {
       .all(`%${query}%`, `%${query}%`, limit) as FishDbRow[];
 
     if (results.length > 0) {
-      return this.transformDbRowsToFishWithImages(results);
+      return includeImages
+        ? this.transformDbRowsToFishWithImages(results)
+        : this.transformDbRowsToFish(results);
     }
 
     // 4. FTS5 search (try both original and romaji for better results)
@@ -167,7 +171,9 @@ export class SearchService {
       .all(romajiQuery, limit) as FishDbRow[];
 
     if (results.length > 0) {
-      return this.transformDbRowsToFishWithImages(results);
+      return includeImages
+        ? this.transformDbRowsToFishWithImages(results)
+        : this.transformDbRowsToFish(results);
     }
 
     // Then try original query (for English or already romaji)
