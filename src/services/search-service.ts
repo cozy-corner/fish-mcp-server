@@ -84,7 +84,8 @@ export class SearchService {
 
   // カタカナ・ひらがなをローマ字に変換
   private toRomaji(str: string): string {
-    return wanakana.toRomaji(str).toLowerCase();
+    const r = wanakana.toRomaji(str, { upcaseKatakana: false }).toLowerCase();
+    return r.replace(/ou/g, 'ô').replace(/uu/g, 'û');
   }
 
   async searchFishByName(
