@@ -96,7 +96,8 @@ CREATE TABLE IF NOT EXISTS common_names (
   preferred_name INTEGER NOT NULL DEFAULT 0, -- boolean
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   
-  FOREIGN KEY (spec_code) REFERENCES fish(spec_code)
+  FOREIGN KEY (spec_code) REFERENCES fish(spec_code),
+  UNIQUE(com_name, spec_code, language) -- 重複防止用の一意制約
 );
 
 -- common_namesテーブルのインデックス
