@@ -32,8 +32,11 @@ jobs:
     - name: Run TypeScript type check
       run: npm run typecheck
 
-    - name: Run tests
-      run: npm test
-
     - name: Build project
       run: npm run build
+
+    - name: Load sample data for tests
+      run: npm run load-sample-data
+
+    - name: Run tests
+      run: npm test
