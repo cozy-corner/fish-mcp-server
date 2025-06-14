@@ -32,6 +32,30 @@ export interface SearchFeatures {
 
 export type FishWithMatch = Fish & { matchType: string; matchedName?: string };
 
+/**
+ * 検索クエリで受け付け可能な文字種
+ * @description 魚名検索で使用できる文字の種類を定義
+ */
+export type SupportedScript =
+  | 'katakana' // カタカナ（例: マグロ、サバ）
+  | 'hiragana' // ひらがな（例: まぐろ、さば）
+  | 'romaji' // ローマ字（例: maguro、saba）
+  | 'english' // 英語（例: tuna、mackerel）
+  | 'latin'; // 学名（例: Thunnus、Scomber）
+
+/**
+ * 魚名検索の制限事項と対応状況
+ * @description 現在の検索機能の制限を明示
+ */
+export interface SearchLimitations {
+  /** 漢字での検索は制限あり（例: 「鮪」「鯖」）- FishBaseデータに漢字が少ないため */
+  kanjiSupport: 'limited';
+  /** 複合語の検索精度は中程度（Unicode61 tokenizerの制限） */
+  compoundWordAccuracy: 'moderate';
+  /** 形態素解析は未対応（ICU tokenizerが必要） */
+  morphologicalAnalysis: 'unsupported';
+}
+
 interface FishDbRow {
   spec_code: number;
   genus: string;
@@ -88,6 +112,52 @@ export class SearchService {
     return r.replace(/ou/g, 'ô').replace(/uu/g, 'û');
   }
 
+  /**
+   * 魚名による検索を実行
+   *
+   * @param query - 検索クエリ（対応文字種: カタカナ、ひらがな、ローマ字、英語、学名）
+   * @param limit - 検索結果の最大件数（デフォルト: 10）
+   * @param includeImages - 画像情報を含めるかどうか（デフォルト: false）
+   * @returns 検索結果の魚の配列
+   *
+   * @example
+   * ```typescript
+   * // カタカナ検索
+   * const results1 = await searchService.searchFishByName('マグロ');
+   *
+   * // ひらがな検索
+   * const results2 = await searchService.searchFishByName('まぐろ');
+   *
+   * // ローマ字検索
+   * const results3 = await searchService.searchFishByName('maguro');
+   *
+   * // 英語検索
+   * const results4 = await searchService.searchFishByName('tuna');
+   *
+   * // 画像付き検索
+   * const results5 = await searchService.searchFishByName('マグロ', 5, true);
+   * ```
+   *
+   * @remarks
+   * ## 対応文字種
+   * - **カタカナ**: マグロ、サバ、アジ等
+   * - **ひらがな**: まぐろ、さば、あじ等
+   * - **ローマ字**: maguro、saba、aji等
+   * - **英語**: tuna、mackerel、horse mackerel等
+   * - **学名**: Thunnus、Scomber、Trachurus等
+   *
+   * ## 制限事項
+   * - **漢字検索**: 制限あり（鮪、鯖等）- FishBaseデータに漢字表記が少ないため
+   * - **複合語**: 検索精度は中程度（Unicode61 tokenizerの制限）
+   * - **形態素解析**: 未対応（将来的にICU tokenizerで改善予定）
+   *
+   * ## 検索戦略
+   * 1. 日本語名完全一致（原文＋ローマ字変換）
+   * 2. 日本語名部分一致
+   * 3. コメント・説明文内検索
+   * 4. FTS5全文検索
+   * 5. 英語名部分一致
+   */
   async searchFishByName(
     query: string,
     limit: number = 10,
