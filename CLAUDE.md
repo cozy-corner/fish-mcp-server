@@ -94,6 +94,46 @@ Available commands:
 1. Development: `npm run check-all` (fixes issues automatically)
 2. Pre-commit: `npm run check-ci` (ensures CI compatibility)
 
+## Testing Guidelines
+**USE Node.js built-in test framework for all tests**
+
+When writing tests:
+- Use Node.js built-in test runner (`node:test`) - **NOT jest, vitest, or mocha**
+- Use `node:assert/strict` for assertions
+- Place test files in `__tests__` directories next to the code being tested
+- Name test files with `.test.ts` suffix
+
+**Test structure example**:
+```typescript
+import { describe, it, before, after } from 'node:test';
+import assert from 'node:assert/strict';
+
+describe('Feature being tested', () => {
+  before(() => {
+    // Setup
+  });
+
+  after(() => {
+    // Cleanup
+  });
+
+  it('should behave as expected', () => {
+    // Arrange
+    const input = 'test';
+    
+    // Act
+    const result = functionUnderTest(input);
+    
+    // Assert
+    assert.equal(result, 'expected');
+  });
+});
+```
+
+**Running tests**:
+- `npm test` - Run all tests
+- `npx tsx --test src/path/to/file.test.ts` - Run specific test file
+
 ## ⚠️ CRITICAL: MCP Server Development Rules
 
 ### Console Output Prohibition

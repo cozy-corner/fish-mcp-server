@@ -306,10 +306,10 @@ export class SearchService {
     if (features.dangerous !== undefined) {
       if (features.dangerous) {
         whereConditions.push(
-          'dangerous IS NOT NULL AND dangerous != "harmless"'
+          "dangerous IS NOT NULL AND dangerous != 'harmless'"
         );
       } else {
-        whereConditions.push('(dangerous IS NULL OR dangerous = "harmless")');
+        whereConditions.push("(dangerous IS NULL OR dangerous = 'harmless')");
       }
     }
 

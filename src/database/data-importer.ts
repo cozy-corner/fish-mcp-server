@@ -91,7 +91,7 @@ export class DataImporter {
 
   buildFTSIndex(): void {
     this.db.exec(`
-      INSERT INTO fish_search(scientific_name, fb_name, comments, remarks, japanese_names, english_names)
+      INSERT OR IGNORE INTO fish_search(scientific_name, fb_name, comments, remarks, japanese_names, english_names)
       SELECT 
         f.scientific_name,
         f.fb_name,
@@ -103,7 +103,7 @@ export class DataImporter {
     `);
 
     this.db.exec(`
-      INSERT INTO name_search(com_name, language)
+      INSERT OR IGNORE INTO name_search(com_name, language)
       SELECT com_name, language FROM common_names;
     `);
   }
