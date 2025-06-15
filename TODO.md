@@ -84,9 +84,9 @@
   - 現在の検索優先順位（完全一致→部分一致→FTS5）は適切なため維持
 - [ ] **searchFishByNaturalLanguage関数の新規実装**
   - 自然言語クエリをサポート（「大きくて危険な魚」「深海に住む魚」など）
-  - 自然言語を解析してSearchFeaturesパラメータに変換
-  - 内部でsearchFishByFeaturesを呼び出す設計
-  - コメント・説明文からの特徴検索も統合
+  - FTS5を使用してcomments/remarksフィールドを直接全文検索
+  - FTS5のrank/bm25スコアリングを使用して関連性順にソート
+  - 低スコアの結果をフィルタリングして検索精度を向上
   - MCPツール「search_fish_by_natural_language」として公開
 - [ ] **検索精度向上のためのテストケース作成**
   - より網羅的な日本語検索テスト
