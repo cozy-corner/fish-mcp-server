@@ -154,9 +154,8 @@ export class SearchService {
    * ## 検索戦略
    * 1. 日本語名完全一致（原文＋ローマ字変換）
    * 2. 日本語名部分一致
-   * 3. コメント・説明文内検索
-   * 4. FTS5全文検索
-   * 5. 英語名部分一致
+   * 3. FTS5全文検索
+   * 4. 英語名部分一致
    */
   async searchFishByName(
     query: string,
@@ -208,25 +207,7 @@ export class SearchService {
         : this.transformDbRowsToFish(results);
     }
 
-    // 3. Comments/Remarks partial match (for descriptive queries)
-    results = this.db
-      .prepare(
-        `
-      SELECT DISTINCT f.*, 'description_match' as match_type, NULL as matched_name
-      FROM fish f
-      WHERE f.comments LIKE ? OR f.remarks LIKE ?
-      LIMIT ?
-    `
-      )
-      .all(`%${query}%`, `%${query}%`, limit) as FishDbRow[];
-
-    if (results.length > 0) {
-      return includeImages
-        ? this.transformDbRowsToFishWithImages(results)
-        : this.transformDbRowsToFish(results);
-    }
-
-    // 4. FTS5 search (try both original and romaji for better results)
+    // 3. FTS5 search (try both original and romaji for better results)
     // First try romaji version (for Japanese input)
     results = this.db
       .prepare(
@@ -263,11 +244,13 @@ export class SearchService {
         .all(query, limit) as FishDbRow[];
 
       if (results.length > 0) {
-        return this.transformDbRowsToFish(results);
+        return includeImages
+          ? this.transformDbRowsToFishWithImages(results)
+          : this.transformDbRowsToFish(results);
       }
     }
 
-    // 5. English name fallback
+    // 4. English name fallback
     results = this.db
       .prepare(
         `
