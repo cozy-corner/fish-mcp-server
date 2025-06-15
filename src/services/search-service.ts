@@ -244,7 +244,9 @@ export class SearchService {
         .all(query, limit) as FishDbRow[];
 
       if (results.length > 0) {
-        return this.transformDbRowsToFish(results);
+        return includeImages
+          ? this.transformDbRowsToFishWithImages(results)
+          : this.transformDbRowsToFish(results);
       }
     }
 
