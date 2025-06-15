@@ -3,6 +3,44 @@
 ## Project Overview
 Fish MCP Server - An MCP server for searching fish information in Japanese, using FishBase data with local SQLite + FTS5 for full-text search.
 
+## ⚠️ CRITICAL: Git Operations - User Permission Required
+
+### Git Command Restrictions
+**NEVER execute git commands without explicit user instruction:**
+
+- `git add`
+- `git commit` 
+- `git push`
+- `git merge`
+- `git rebase`
+- `git reset`
+- `git revert`
+
+### Required Workflow
+1. **Make code changes** as requested
+2. **Run tests** to verify changes work
+3. **ASK USER** before any git operations: "Ready to commit these changes?"
+4. **WAIT** for explicit user approval before proceeding
+5. **Only then** execute git commands if user approves
+
+### Exception 1: Explicit User Commands
+Git operations are ONLY allowed when user explicitly requests them with commands like:
+- "commit these changes"
+- "create a PR"
+- "add and commit"
+- "push to remote"
+
+### Exception 2: PR Review Response Workflow
+When user approves a fix proposal during PR review:
+- User says "OK" or "approve" to a proposed fix
+- **Automatically execute**: implement fix → commit → push → reply to comment
+- Use the existing "Automatic Fix Workflow" described below
+
+### TodoWrite Rules
+- **NEVER** add "commit changes" or similar git tasks to TodoWrite
+- Focus TodoWrite on code implementation tasks only
+- Let user decide when to commit
+
 ## ⚠️ CRITICAL: PR Review Comment Check (MUST DO FIRST)
 When working on PRs, **ALWAYS execute these two commands FIRST**:
 
