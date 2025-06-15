@@ -3,13 +3,13 @@ import type { Tool } from '@modelcontextprotocol/sdk/types.js';
 export const searchFishByNameTool: Tool = {
   name: 'search_fish_by_name',
   description:
-    '魚の名前（日本語または英語）から魚を検索します。ひらがな、カタカナ、漢字、英語に対応しています。',
+    '魚の名前（日本語または英語）から魚を検索します。ひらがな、カタカナ、英語に対応しています。',
   inputSchema: {
     type: 'object',
     properties: {
       query: {
         type: 'string',
-        description: '検索する魚の名前（例: "マグロ", "まぐろ", "鮪", "tuna"）',
+        description: '検索する魚の名前（例: "マグロ", "まぐろ", "tuna"）',
       },
       limit: {
         type: 'number',
