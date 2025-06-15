@@ -208,11 +208,9 @@ describe('SearchService', () => {
       const results = await searchService.searchFishByName('tuna', 10);
       assert.equal(results.length, 1);
       assert.equal(results[0].specCode, 1);
-      // Could be description_match or english_partial
+      // Could be english_partial or fts_search
       assert.ok(
-        ['description_match', 'english_partial', 'fts_search'].includes(
-          results[0].matchType
-        )
+        ['english_partial', 'fts_search'].includes(results[0].matchType)
       );
     });
 
