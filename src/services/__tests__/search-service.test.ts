@@ -37,7 +37,6 @@ describe('SearchService', () => {
         gamefish: true,
         comments:
           'A large oceanic fish found in tropical and subtropical waters',
-        remarks: 'Important commercial fish for tuna industry',
       },
       {
         specCode: 2,
@@ -50,7 +49,6 @@ describe('SearchService', () => {
         saltwater: true,
         gamefish: false,
         comments: 'Common pelagic fish in the Pacific Ocean',
-        remarks: 'Forms large schools',
       },
       {
         specCode: 3,
@@ -63,7 +61,6 @@ describe('SearchService', () => {
         saltwater: true,
         gamefish: false,
         comments: 'Butterfly fish with golden coloration',
-        remarks: 'Found in coral reefs',
       },
       {
         specCode: 4,
@@ -76,7 +73,6 @@ describe('SearchService', () => {
         saltwater: false,
         gamefish: false,
         comments: 'Freshwater loach species',
-        remarks: 'Used in traditional medicine',
       },
     ];
 
