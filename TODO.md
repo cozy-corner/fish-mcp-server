@@ -82,6 +82,11 @@
   - コメント・説明文検索を削除（特徴検索は新規実装するsearchFishByNaturalLanguageの責務）
   - 名前検索（日本語名、英語名、学名）に特化
   - 現在の検索優先順位（完全一致→部分一致→FTS5）は適切なため維持
+- [x] **未使用のremarksフィールドを削除**
+  - schema.sqlからremarksカラム削除
+  - FTS5のfish_searchテーブルからremarksフィールド削除
+  - data-loader.tsからRemarksマッピング削除（Parquetには存在しない）
+  - Fish型定義からremarksフィールド削除
 - [ ] **searchFishByNaturalLanguage関数の新規実装（Phase 1: 基本機能）**
   - SearchServiceにsearchFishByNaturalLanguageメソッド追加
   - FTS5を使用してcommentsフィールドを直接全文検索
