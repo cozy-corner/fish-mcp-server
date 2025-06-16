@@ -104,17 +104,15 @@ CREATE INDEX IF NOT EXISTS idx_common_names_spec_code ON common_names(spec_code)
 CREATE INDEX IF NOT EXISTS idx_common_names_language ON common_names(language);
 CREATE INDEX IF NOT EXISTS idx_common_names_name ON common_names(com_name);
 
--- FTS5 Virtual Table: 魚の全文検索
+-- FTS5 Virtual Table: 魚の全文検索（contentless）
 -- 日本語と英語での検索を高速化
+-- contentlessのため手動でデータ投入が必要
 CREATE VIRTUAL TABLE IF NOT EXISTS fish_search USING fts5(
   scientific_name,
   fb_name,
   comments,
-  -- 一般名も含める（結合して追加）
-  japanese_names,
-  english_names,
-  content='fish',
-  content_rowid='spec_code',
+  japanese_names,  -- common_namesテーブルから集約
+  english_names,   -- common_namesテーブルから集約
   tokenize='unicode61 remove_diacritics 1'  -- 日本語対応tokenizer（SQLite標準）
 );
 

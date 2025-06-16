@@ -70,3 +70,25 @@ export const searchFishByFeaturesTool: Tool = {
     required: [],
   },
 };
+
+export const searchFishByNaturalLanguageTool: Tool = {
+  name: 'search_fish_by_natural_language',
+  description:
+    '自然言語で魚を検索します。魚の説明文（生態、特徴、用途など）から検索できます。英語での検索を推奨します。',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      query: {
+        type: 'string',
+        description:
+          '自然言語の検索クエリ（例: "deep sea dangerous fish", "tropical colorful fish", "commercial food fish"）。注：データベースの説明文は主に英語のため、英語での検索を推奨します。',
+      },
+      limit: {
+        type: 'number',
+        description: '検索結果の最大件数（デフォルト: 10）',
+        default: 10,
+      },
+    },
+    required: ['query'],
+  },
+};

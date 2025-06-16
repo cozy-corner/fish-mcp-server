@@ -87,11 +87,13 @@
   - FTS5のfish_searchテーブルからremarksフィールド削除
   - data-loader.tsからRemarksマッピング削除（Parquetには存在しない）
   - Fish型定義からremarksフィールド削除
-- [ ] **searchFishByNaturalLanguage関数の新規実装（Phase 1: 基本機能）**
-  - SearchServiceにsearchFishByNaturalLanguageメソッド追加
-  - FTS5を使用してcommentsフィールドを直接全文検索
-  - 基本的な自然言語クエリをサポート
-  - MCPツール「search_fish_by_natural_language」として公開
+- [x] **searchFishByNaturalLanguage関数の新規実装（Phase 1: 基本機能）**
+  - [x] SearchServiceにsearchFishByNaturalLanguageメソッド追加
+  - [x] FTS5を使用してcommentsフィールドを直接全文検索
+  - [x] 基本的な自然言語クエリをサポート
+  - [x] MCPツール「search_fish_by_natural_language」として公開
+  - [x] FTS5スキーマをcontentlessに修正（japanese_names/english_names問題解決）
+  - [x] テストコード作成（12個のテストケース）
 - [ ] **searchFishByNaturalLanguage機能拡張（Phase 2: スコアリング）**
   - FTS5のrank/bm25スコアリングを使用して関連性順にソート
   - 低スコアの結果をフィルタリングして検索精度を向上
@@ -101,6 +103,10 @@
   - 統合テストの実装
   - スコア閾値の最適化
   - パフォーマンス検証
+- [ ] **FTS5トークナイザーの改善**
+  - Unicode61 tokenizerの語幹処理問題を解決（reef/reefsなどの単複形マッチング）
+  - クエリ前処理で一般的な単複形パターンを対応（fish/fishes, reef/reefsなど）
+  - ICU tokenizerへのアップグレードを検討（長期的改善）
 - [ ] **検索精度向上のためのテストケース作成**
   - より網羅的な日本語検索テスト
   - ローマ字検索のテストカバレッジ拡大

@@ -89,19 +89,26 @@ export class DataImporter {
   }
 
   buildFTSIndex(): void {
+    // Clear existing FTS data
+    this.db.exec(`DELETE FROM fish_search;`);
+
+    // Insert into contentless FTS5 with explicit rowid
     this.db.exec(`
-      INSERT OR IGNORE INTO fish_search(scientific_name, fb_name, comments, japanese_names, english_names)
+      INSERT INTO fish_search(rowid, scientific_name, fb_name, comments, japanese_names, english_names)
       SELECT 
+        f.spec_code,
         f.scientific_name,
         f.fb_name,
         f.comments,
-        (SELECT GROUP_CONCAT(cn1.com_name, ' ') FROM common_names cn1 WHERE cn1.spec_code = f.spec_code AND cn1.language = 'Japanese'),
-        (SELECT GROUP_CONCAT(cn2.com_name, ' ') FROM common_names cn2 WHERE cn2.spec_code = f.spec_code AND cn2.language = 'English')
+        COALESCE((SELECT GROUP_CONCAT(cn1.com_name, ' ') FROM common_names cn1 WHERE cn1.spec_code = f.spec_code AND cn1.language = 'Japanese'), ''),
+        COALESCE((SELECT GROUP_CONCAT(cn2.com_name, ' ') FROM common_names cn2 WHERE cn2.spec_code = f.spec_code AND cn2.language = 'English'), '')
       FROM fish f;
     `);
 
+    // Clear and rebuild name_search FTS index
+    this.db.exec(`DELETE FROM name_search;`);
     this.db.exec(`
-      INSERT OR IGNORE INTO name_search(com_name, language)
+      INSERT INTO name_search(com_name, language)
       SELECT com_name, language FROM common_names;
     `);
   }
