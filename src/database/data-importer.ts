@@ -18,7 +18,7 @@ export class DataImporter {
         depth_range_shallow_m, depth_range_deep_m,
         dangerous, gamefish, aquarium, aquaculture_use, bait_use, importance, price_category,
         body_shape, migration_pattern, electric_ability,
-        comments, remarks
+        comments
       ) VALUES (
         ?, ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?,
@@ -26,7 +26,7 @@ export class DataImporter {
         ?, ?,
         ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?,
-        ?, ?
+        ?
       )
     `);
 
@@ -60,8 +60,7 @@ export class DataImporter {
           f.bodyShape,
           f.migrationPattern,
           f.electricAbility,
-          f.comments,
-          f.remarks
+          f.comments
         );
       }
     });
@@ -91,12 +90,11 @@ export class DataImporter {
 
   buildFTSIndex(): void {
     this.db.exec(`
-      INSERT OR IGNORE INTO fish_search(scientific_name, fb_name, comments, remarks, japanese_names, english_names)
+      INSERT OR IGNORE INTO fish_search(scientific_name, fb_name, comments, japanese_names, english_names)
       SELECT 
         f.scientific_name,
         f.fb_name,
         f.comments,
-        f.remarks,
         (SELECT GROUP_CONCAT(cn1.com_name, ' ') FROM common_names cn1 WHERE cn1.spec_code = f.spec_code AND cn1.language = 'Japanese'),
         (SELECT GROUP_CONCAT(cn2.com_name, ' ') FROM common_names cn2 WHERE cn2.spec_code = f.spec_code AND cn2.language = 'English')
       FROM fish f;

@@ -54,7 +54,6 @@ async function loadSampleData() {
         importance: CommercialImportance.HIGHLY_COMMERCIAL,
         bodyShape: BodyShape.FUSIFORM,
         comments: '大型の回遊魚で、高速で泳ぐ。商業的に重要な魚種。',
-        remarks: '危険性は低いが、大きな個体は注意が必要。',
       },
       {
         specCode: 2,
@@ -79,7 +78,6 @@ async function loadSampleData() {
         importance: CommercialImportance.MINOR_COMMERCIAL,
         bodyShape: BodyShape.FUSIFORM,
         comments: '大型の肉食性サメ。非常に危険。',
-        remarks: '深海から浅海まで広く分布。攻撃的で危険な魚。',
       },
       {
         specCode: 3,
@@ -103,7 +101,6 @@ async function loadSampleData() {
         aquarium: AquariumSuitability.NO,
         importance: CommercialImportance.COMMERCIAL,
         comments: '深海魚の一種。美しい赤色。',
-        remarks: '深海に生息する。毒はないが棘に注意。',
       },
       {
         specCode: 4,
@@ -127,7 +124,6 @@ async function loadSampleData() {
         aquarium: AquariumSuitability.YES,
         importance: CommercialImportance.NO_INTEREST,
         comments: '小型のフグ。体に毒を持つ。',
-        remarks: '観賞魚として人気があるが、取り扱いに注意が必要。',
       },
     ];
 

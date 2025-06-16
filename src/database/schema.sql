@@ -73,7 +73,6 @@ CREATE TABLE IF NOT EXISTS fish (
   
   -- 説明文
   comments TEXT,
-  remarks TEXT,
   
   -- メタデータ
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -111,7 +110,6 @@ CREATE VIRTUAL TABLE IF NOT EXISTS fish_search USING fts5(
   scientific_name,
   fb_name,
   comments,
-  remarks,
   -- 一般名も含める（結合して追加）
   japanese_names,
   english_names,
