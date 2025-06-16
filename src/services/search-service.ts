@@ -268,6 +268,67 @@ export class SearchService {
       : this.transformDbRowsToFish(results);
   }
 
+  /**
+   * 自然言語による魚の検索
+   *
+   * @param query - 自然言語クエリ（例: "深海に住む危険な魚", "tropical colorful fish"）
+   * @param limit - 検索結果の最大件数（デフォルト: 10）
+   * @returns 検索結果の魚の配列
+   *
+   * @example
+   * ```typescript
+   * // 日本語での自然言語検索
+   * const results1 = await searchService.searchFishByNaturalLanguage('深海に住む大きな魚');
+   *
+   * // 英語での自然言語検索
+   * const results2 = await searchService.searchFishByNaturalLanguage('dangerous fish in coral reefs');
+   *
+   * // 複合的な検索
+   * const results3 = await searchService.searchFishByNaturalLanguage('食用になる海水魚');
+   * ```
+   *
+   * @remarks
+   * - FTS5を使用してcommentsフィールドを全文検索
+   * - 日本語・英語の両方に対応
+   * - AND/OR演算子をサポート
+   * - 関連度順にソート
+   */
+  async searchFishByNaturalLanguage(
+    query: string,
+    limit: number = 10
+  ): Promise<FishWithMatch[]> {
+    // クエリの前処理
+    const processedQuery = query.trim();
+    if (!processedQuery) {
+      return [];
+    }
+
+    // FTS5でcommentsフィールドを検索
+    const results = this.db
+      .prepare(
+        `
+        SELECT f.*, 'natural_language' as match_type, 
+               snippet(fish_search, 2, '[', ']', '...', 30) as matched_snippet
+        FROM fish f
+        JOIN fish_search fs ON f.spec_code = fs.rowid
+        WHERE fish_search MATCH ?
+        ORDER BY rank
+        LIMIT ?
+      `
+      )
+      .all(processedQuery, limit) as (FishDbRow & {
+      matched_snippet: string;
+    })[];
+
+    // matchedNameフィールドにsnippetを設定
+    const fishResults = results.map(row => ({
+      ...row,
+      matched_name: row.matched_snippet,
+    }));
+
+    return this.transformDbRowsToFish(fishResults);
+  }
+
   async searchFishByFeatures(
     features: SearchFeatures,
     limit: number = 10
