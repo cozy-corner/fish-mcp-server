@@ -107,7 +107,8 @@ CREATE INDEX IF NOT EXISTS idx_common_names_name ON common_names(com_name);
 -- FTS5 Virtual Table: 魚の全文検索（contentless）
 -- 日本語と英語での検索を高速化
 -- contentlessのため手動でデータ投入が必要
-CREATE VIRTUAL TABLE IF NOT EXISTS fish_search USING fts5(
+DROP TABLE IF EXISTS fish_search;
+CREATE VIRTUAL TABLE fish_search USING fts5(
   scientific_name,
   fb_name,
   comments,
@@ -117,7 +118,8 @@ CREATE VIRTUAL TABLE IF NOT EXISTS fish_search USING fts5(
 );
 
 -- FTS5 Virtual Table: 一般名での検索
-CREATE VIRTUAL TABLE IF NOT EXISTS name_search USING fts5(
+DROP TABLE IF EXISTS name_search;
+CREATE VIRTUAL TABLE name_search USING fts5(
   com_name,
   language,
   content='common_names', 
