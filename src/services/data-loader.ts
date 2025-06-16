@@ -43,7 +43,6 @@ interface FishBaseSpeciesRow {
   Migration?: string;
   Electric?: string;
   Comments?: string;
-  Remarks?: string;
 }
 
 interface FishBaseCommonNameRow {
@@ -374,7 +373,6 @@ export class FishBaseDataLoader {
       migrationPattern: this.normalizeMigrationPattern(row.Migration),
       electricAbility: this.normalizeElectricAbility(row.Electric),
       comments: row.Comments,
-      remarks: row.Remarks,
     };
   }
 

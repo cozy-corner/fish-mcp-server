@@ -85,7 +85,6 @@ interface FishDbRow {
   migration_pattern?: string;
   electric_ability?: string;
   comments?: string;
-  remarks?: string;
   match_type?: string;
   matched_name?: string;
 }
@@ -418,7 +417,6 @@ export class SearchService {
       migrationPattern: row.migration_pattern as MigrationPattern | undefined,
       electricAbility: row.electric_ability as ElectricAbility | undefined,
       comments: row.comments,
-      remarks: row.remarks,
       matchType: row.match_type || 'unknown',
       matchedName: row.matched_name,
     }));

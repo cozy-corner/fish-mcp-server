@@ -146,7 +146,6 @@ export interface Fish {
 
   // 説明
   comments?: string; // 詳細な説明
-  remarks?: string; // 備考
 
   // 画像情報
   images?: FishImage[]; // 画像情報配列（外部API経由で取得）
