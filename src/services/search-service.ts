@@ -268,6 +268,62 @@ export class SearchService {
       : this.transformDbRowsToFish(results);
   }
 
+  /**
+   * 自然言語での魚検索を実行
+   *
+   * @param query - 自然言語クエリ（例: "大きくて危険な魚", "美しい熱帯魚", "深海に住む魚"）
+   * @param limit - 検索結果の最大件数（デフォルト: 10）
+   * @returns 検索結果の魚の配列
+   *
+   * @example
+   * ```typescript
+   * // 特徴による検索
+   * const results1 = await searchService.searchFishByNaturalLanguage('大きくて危険な魚');
+   *
+   * // 生息地による検索
+   * const results2 = await searchService.searchFishByNaturalLanguage('深海魚');
+   *
+   * // 外見による検索
+   * const results3 = await searchService.searchFishByNaturalLanguage('美しい色の熱帯魚');
+   * ```
+   *
+   * @remarks
+   * ## 検索対象
+   * - **comments フィールド**: 魚の特徴、行動、外見などの説明文
+   * - **FTS5 全文検索**: SQLite の高速全文検索エンジンを使用
+   *
+   * ## 検索例
+   * - 特徴: "大きい", "小さい", "危険", "美しい", "カラフル"
+   * - 生息地: "深海", "サンゴ礁", "淡水", "海水"
+   * - 行動: "群れ", "単独", "夜行性", "攻撃的"
+   * - 用途: "食用", "観賞魚", "釣り"
+   *
+   * ## 検索精度
+   * - Unicode61 tokenizer による日本語・英語対応
+   * - 部分一致での柔軟な検索
+   * - 関連性スコアによる結果ソート
+   */
+  async searchFishByNaturalLanguage(
+    query: string,
+    limit: number = 10
+  ): Promise<FishWithMatch[]> {
+    // FTS5を使用してcommentsフィールドを全文検索
+    const results = this.db
+      .prepare(
+        `
+      SELECT f.*, 'natural_language' as match_type, NULL as matched_name
+      FROM fish f
+      JOIN fish_search fs ON f.spec_code = fs.rowid
+      WHERE fish_search MATCH ?
+      ORDER BY rank
+      LIMIT ?
+    `
+      )
+      .all(query, limit) as FishDbRow[];
+
+    return this.transformDbRowsToFish(results);
+  }
+
   async searchFishByFeatures(
     features: SearchFeatures,
     limit: number = 10

@@ -89,9 +89,12 @@ export class DataImporter {
   }
 
   buildFTSIndex(): void {
+    // For FTS5 virtual tables, use INSERT OR REPLACE instead of DELETE + INSERT
+    // This avoids potential issues with DELETE on virtual tables
     this.db.exec(`
-      INSERT OR IGNORE INTO fish_search(scientific_name, fb_name, comments, japanese_names, english_names)
+      INSERT OR REPLACE INTO fish_search(rowid, scientific_name, fb_name, comments, japanese_names, english_names)
       SELECT 
+        f.spec_code,
         f.scientific_name,
         f.fb_name,
         f.comments,
@@ -101,8 +104,12 @@ export class DataImporter {
     `);
 
     this.db.exec(`
-      INSERT OR IGNORE INTO name_search(com_name, language)
-      SELECT com_name, language FROM common_names;
+      INSERT OR REPLACE INTO name_search(rowid, com_name, language)
+      SELECT 
+        cn.id,
+        cn.com_name, 
+        cn.language 
+      FROM common_names cn;
     `);
   }
 }

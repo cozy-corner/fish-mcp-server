@@ -53,7 +53,7 @@ async function loadSampleData() {
         aquarium: AquariumSuitability.NEVER,
         importance: CommercialImportance.HIGHLY_COMMERCIAL,
         bodyShape: BodyShape.FUSIFORM,
-        comments: '大型の回遊魚で、高速で泳ぐ。商業的に重要な魚種。',
+        comments: 'Large migratory fish that swims at high speed. Commercially important species.',
       },
       {
         specCode: 2,
@@ -77,7 +77,7 @@ async function loadSampleData() {
         aquarium: AquariumSuitability.NEVER,
         importance: CommercialImportance.MINOR_COMMERCIAL,
         bodyShape: BodyShape.FUSIFORM,
-        comments: '大型の肉食性サメ。非常に危険。',
+        comments: 'Large predatory shark. Extremely dangerous and aggressive.',
       },
       {
         specCode: 3,
@@ -100,7 +100,7 @@ async function loadSampleData() {
         gamefish: true,
         aquarium: AquariumSuitability.NO,
         importance: CommercialImportance.COMMERCIAL,
-        comments: '深海魚の一種。美しい赤色。',
+        comments: 'Deep sea fish species. Beautiful red coloration.',
       },
       {
         specCode: 4,
@@ -123,7 +123,7 @@ async function loadSampleData() {
         gamefish: false,
         aquarium: AquariumSuitability.YES,
         importance: CommercialImportance.NO_INTEREST,
-        comments: '小型のフグ。体に毒を持つ。',
+        comments: 'Small pufferfish. Poisonous to eat.',
       },
     ];
 
