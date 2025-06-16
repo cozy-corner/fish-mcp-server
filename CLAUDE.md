@@ -132,6 +132,23 @@ Available commands:
 1. Development: `npm run check-all` (fixes issues automatically)
 2. Pre-commit: `npm run check-ci` (ensures CI compatibility)
 
+## ⚠️ CRITICAL: Pre-commit Hook Policy
+
+### 🚫 STRICTLY FORBIDDEN:
+- **NEVER use `git commit --no-verify`** to bypass pre-commit hooks
+- **NEVER use `git commit -n`** to skip verification
+- **NEVER bypass quality gates** under any circumstances
+
+### ✅ REQUIRED when pre-commit hook fails:
+1. **STOP**: Do not attempt to bypass the hook
+2. **READ**: Examine the exact error message carefully
+3. **FIX**: Resolve the root cause (not symptoms)
+4. **TEST**: Run full test suite locally (`npm test`)
+5. **VERIFY**: Ensure all quality checks pass
+6. **COMMIT**: Only after complete resolution
+
+**Remember**: Pre-commit hooks are the final quality gate. Bypassing them compromises the entire codebase integrity.
+
 ## Testing Guidelines
 **USE Node.js built-in test framework for all tests**
 
