@@ -300,26 +300,35 @@ export class SearchService {
    *
    * ## 検索精度
    * - Unicode61 tokenizer による日本語・英語対応
-   * - 部分一致での柔軟な検索
+   * - BM25 スコアリングアルゴリズムによる関連性評価
+   * - スコア閾値による低関連性結果のフィルタリング
    * - 関連性スコアによる結果ソート
    */
   async searchFishByNaturalLanguage(
     query: string,
     limit: number = 10
   ): Promise<FishWithMatch[]> {
+    // BM25スコアの閾値（負の値が高スコア）
+    const SCORE_THRESHOLD = -10.0;
+
     // FTS5を使用してcommentsフィールドを全文検索
+    // bm25()関数でスコアを取得（負の値ほど関連性が高い）
     const results = this.db
       .prepare(
         `
-      SELECT f.*, 'natural_language' as match_type, NULL as matched_name
+      SELECT f.*, 
+             'natural_language' as match_type, 
+             NULL as matched_name,
+             bm25(fish_search) as score
       FROM fish f
       JOIN fish_search fs ON f.spec_code = fs.rowid
       WHERE fish_search MATCH ?
-      ORDER BY rank
+        AND bm25(fish_search) > ?
+      ORDER BY bm25(fish_search)
       LIMIT ?
     `
       )
-      .all(query, limit) as FishDbRow[];
+      .all(query, SCORE_THRESHOLD, limit) as FishDbRow[];
 
     return this.transformDbRowsToFish(results);
   }

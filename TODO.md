@@ -92,7 +92,7 @@
   - FTS5を使用してcommentsフィールドを直接全文検索
   - 基本的な自然言語クエリをサポート
   - MCPツール「search_fish_by_natural_language」として公開
-- [ ] **searchFishByNaturalLanguage機能拡張（Phase 2: スコアリング）**
+- [x] **searchFishByNaturalLanguage機能拡張（Phase 2: スコアリング）**
   - FTS5のrank/bm25スコアリングを使用して関連性順にソート
   - 低スコアの結果をフィルタリングして検索精度を向上
   - スコア閾値の実装と調整
