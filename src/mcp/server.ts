@@ -1,7 +1,11 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { DatabaseManager } from '../database/db-manager.js';
 import { SearchService } from '../services/search-service.js';
-import { searchFishByNameTool, searchFishByFeaturesTool } from './tools.js';
+import {
+  searchFishByNameTool,
+  searchFishByFeaturesTool,
+  searchFishByNaturalLanguageTool,
+} from './tools.js';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -38,7 +42,11 @@ export class FishMCPServer {
 
   setupHandlers(): void {
     this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
-      tools: [searchFishByNameTool, searchFishByFeaturesTool],
+      tools: [
+        searchFishByNameTool,
+        searchFishByFeaturesTool,
+        searchFishByNaturalLanguageTool,
+      ],
     }));
 
     this.server.setRequestHandler(CallToolRequestSchema, async request => {
@@ -48,7 +56,7 @@ export class FishMCPServer {
         switch (name) {
           case 'search_fish_by_name': {
             const query = args?.query as string;
-            if (!query) {
+            if (!query || query.trim() === '') {
               throw new Error('検索クエリが指定されていません');
             }
 
@@ -78,6 +86,28 @@ export class FishMCPServer {
                 {
                   type: 'text',
                   text: this.formatFeatureSearchResults(results, options),
+                },
+              ],
+            };
+          }
+
+          case 'search_fish_by_natural_language': {
+            const query = args?.query as string;
+            if (!query || query.trim() === '') {
+              throw new Error('検索クエリが指定されていません');
+            }
+
+            const results =
+              await this.searchService.searchFishByNaturalLanguage(
+                query,
+                args?.limit as number | undefined
+              );
+
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: this.formatNaturalLanguageSearchResults(results, query),
                 },
               ],
             };
@@ -158,6 +188,33 @@ export class FishMCPServer {
       .join('\n');
 
     return `条件（${conditions.join('、')}）に一致する魚（${results.length}件）:\n\n${formattedResults}`;
+  }
+
+  private formatNaturalLanguageSearchResults(
+    results: Fish[],
+    query: string
+  ): string {
+    if (results.length === 0) {
+      return `「${query}」に一致する魚は見つかりませんでした。`;
+    }
+
+    const formattedResults = results
+      .map((fish, index) => {
+        const extendedFish = fish as Fish & { matchedName?: string };
+        const names = extendedFish.matchedName || fish.fbName || '名称不明';
+        const size = fish.length ? `${fish.length}cm` : '不明';
+        const habitat = this.getHabitatDescription(fish);
+        const danger = this.getDangerDescription(fish.dangerous);
+        const comments = fish.comments ? `\n   ${fish.comments}` : '';
+
+        return `${index + 1}. ${names}（${fish.scientificName}）
+   大きさ: ${size}
+   生息地: ${habitat}
+   危険度: ${danger}${comments}`;
+      })
+      .join('\n\n');
+
+    return `「${query}」の自然言語検索結果（${results.length}件）:\n\n${formattedResults}`;
   }
 
   private getHabitatDescription(fish: Fish): string {
