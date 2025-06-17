@@ -56,7 +56,7 @@ export class FishMCPServer {
         switch (name) {
           case 'search_fish_by_name': {
             const query = args?.query as string;
-            if (!query) {
+            if (!query || query.trim() === '') {
               throw new Error('検索クエリが指定されていません');
             }
 
@@ -93,7 +93,7 @@ export class FishMCPServer {
 
           case 'search_fish_by_natural_language': {
             const query = args?.query as string;
-            if (!query) {
+            if (!query || query.trim() === '') {
               throw new Error('検索クエリが指定されていません');
             }
 
