@@ -87,7 +87,7 @@
   - FTS5のfish_searchテーブルからremarksフィールド削除
   - data-loader.tsからRemarksマッピング削除（Parquetには存在しない）
   - Fish型定義からremarksフィールド削除
-- [ ] **searchFishByNaturalLanguage関数の新規実装（Phase 1: 基本機能）**
+- [x] **searchFishByNaturalLanguage関数の新規実装（Phase 1: 基本機能）**
   - SearchServiceにsearchFishByNaturalLanguageメソッド追加
   - FTS5を使用してcommentsフィールドを直接全文検索
   - 基本的な自然言語クエリをサポート
