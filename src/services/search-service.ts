@@ -30,7 +30,11 @@ export interface SearchFeatures {
   includeImages?: boolean;
 }
 
-export type FishWithMatch = Fish & { matchType: string; matchedName?: string };
+export type FishWithMatch = Fish & {
+  matchType: string;
+  matchedName?: string;
+  score?: number;
+};
 
 /**
  * 検索クエリで受け付け可能な文字種
@@ -87,6 +91,7 @@ interface FishDbRow {
   comments?: string;
   match_type?: string;
   matched_name?: string;
+  score?: number;
 }
 
 interface CommonNameDbRow {
@@ -308,8 +313,25 @@ export class SearchService {
     query: string,
     limit: number = 10
   ): Promise<FishWithMatch[]> {
+    // Handle empty query
+    if (!query || query.trim() === '') {
+      return [];
+    }
+
     // BM25スコアの閾値（負の値が高スコア）
     const SCORE_THRESHOLD = -10.0;
+
+    // Sanitize query for FTS5
+    // Remove special characters that can cause syntax errors
+    const sanitizedQuery = query
+      .replace(/[&@#<>(){}[\]"']/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Return empty if sanitized query is empty
+    if (!sanitizedQuery) {
+      return [];
+    }
 
     // FTS5を使用してcommentsフィールドを全文検索
     // bm25()関数でスコアを取得（負の値ほど関連性が高い）
@@ -328,7 +350,7 @@ export class SearchService {
       LIMIT ?
     `
       )
-      .all(query, SCORE_THRESHOLD, limit) as FishDbRow[];
+      .all(sanitizedQuery, SCORE_THRESHOLD, limit) as FishDbRow[];
 
     return this.transformDbRowsToFish(results);
   }
@@ -484,6 +506,7 @@ export class SearchService {
       comments: row.comments,
       matchType: row.match_type || 'unknown',
       matchedName: row.matched_name,
+      score: row.score,
     }));
   }
 }
