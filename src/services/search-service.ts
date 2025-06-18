@@ -321,17 +321,8 @@ export class SearchService {
     // BM25スコアの閾値（負の値が高スコア）
     const SCORE_THRESHOLD = -10.0;
 
-    // Sanitize query for FTS5
-    // Remove special characters that can cause syntax errors
-    const sanitizedQuery = query
-      .replace(/[&@#<>(){}[\]"']/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    // Return empty if sanitized query is empty
-    if (!sanitizedQuery) {
-      return [];
-    }
+    // Handle FTS5 special operators that can cause syntax errors
+    const cleanedQuery = query.replace(/[&@#]/g, ' ');
 
     // FTS5を使用してcommentsフィールドを全文検索
     // bm25()関数でスコアを取得（負の値ほど関連性が高い）
@@ -350,7 +341,7 @@ export class SearchService {
       LIMIT ?
     `
       )
-      .all(sanitizedQuery, SCORE_THRESHOLD, limit) as FishDbRow[];
+      .all(cleanedQuery, SCORE_THRESHOLD, limit) as FishDbRow[];
 
     return this.transformDbRowsToFish(results);
   }
