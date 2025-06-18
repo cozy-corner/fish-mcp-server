@@ -482,4 +482,221 @@ describe('SearchService', () => {
       );
     });
   });
+
+  describe('searchFishByNaturalLanguage', () => {
+    it('should find fish by natural language query with relevant terms', async () => {
+      // Test query that should match tuna's comments
+      const results = await searchService.searchFishByNaturalLanguage(
+        'large oceanic fish tropical waters',
+        10
+      );
+
+      assert(
+        results.length > 0,
+        'Should find results for tropical oceanic fish'
+      );
+      assert(
+        results.some(r => r.specCode === 1),
+        'Should find Yellowfin tuna which matches the description'
+      );
+      assert.equal(results[0].matchType, 'natural_language');
+    });
+
+    it('should filter results by BM25 score threshold', async () => {
+      // Query with partial relevance
+      const results = await searchService.searchFishByNaturalLanguage(
+        'small freshwater aquarium fish',
+        10
+      );
+
+      // Should find freshwater loach but not saltwater fish with low relevance
+      const freshwaterFish = results.filter(r => r.specCode === 4);
+
+      assert(
+        freshwaterFish.length > 0 || results.length === 0,
+        'Should either find freshwater fish or no results due to score threshold'
+      );
+
+      if (results.length > 0) {
+        // If we have results, freshwater fish should score better
+        const loachIndex = results.findIndex(r => r.specCode === 4);
+        assert(
+          loachIndex !== -1 && loachIndex < results.length / 2,
+          'Freshwater loach should rank high for freshwater query'
+        );
+      }
+    });
+
+    it('should handle Japanese natural language queries', async () => {
+      const results = await searchService.searchFishByNaturalLanguage(
+        '熱帯の海にいる大きな魚',
+        10
+      );
+
+      // May or may not find results depending on whether Japanese is in comments
+      assert(Array.isArray(results), 'Should return array even if empty');
+      assert.ok(
+        results.every(r => r.matchType === 'natural_language'),
+        'All results should have natural_language match type'
+      );
+    });
+
+    it('should return empty array for queries below score threshold', async () => {
+      // Query with very low relevance to any fish
+      const results = await searchService.searchFishByNaturalLanguage(
+        'computer software programming code',
+        10
+      );
+
+      assert.equal(
+        results.length,
+        0,
+        'Should return no results for irrelevant query'
+      );
+    });
+
+    it('should handle multi-word queries correctly', async () => {
+      // Test that multi-word queries work with BM25
+      const results = await searchService.searchFishByNaturalLanguage(
+        'Pacific Ocean pelagic fish common',
+        10
+      );
+
+      assert(
+        results.length > 0,
+        'Should find fish matching Pacific Ocean description'
+      );
+      assert(
+        results.some(r => r.specCode === 2),
+        'Should find Pacific mackerel'
+      );
+    });
+
+    it('should respect limit parameter', async () => {
+      const results = await searchService.searchFishByNaturalLanguage(
+        'fish ocean',
+        2
+      );
+
+      assert(results.length <= 2, 'Should respect limit parameter');
+    });
+
+    it('should handle empty query gracefully', async () => {
+      const results = await searchService.searchFishByNaturalLanguage('', 10);
+
+      assert.equal(
+        results.length,
+        0,
+        'Should return empty array for empty query'
+      );
+    });
+
+    it('should handle single-word queries', async () => {
+      const results = await searchService.searchFishByNaturalLanguage(
+        'butterfly',
+        10
+      );
+
+      assert(results.length > 0, 'Should find results for single word query');
+      assert(
+        results.some(r => r.specCode === 3),
+        'Should find butterflyfish'
+      );
+    });
+
+    it('should not include images in natural language search results', async () => {
+      const results = await searchService.searchFishByNaturalLanguage(
+        'tropical fish',
+        10
+      );
+
+      if (results.length > 0) {
+        assert(
+          !('images' in results[0]),
+          'Natural language search should not include images'
+        );
+      }
+    });
+
+    it('should rank results by BM25 score', async () => {
+      const results = await searchService.searchFishByNaturalLanguage(
+        'golden coloration butterfly',
+        10
+      );
+
+      if (results.length > 1) {
+        // Results should be ordered by BM25 score (more negative = better)
+        for (let i = 1; i < results.length; i++) {
+          assert(
+            results[i - 1].score! <= results[i].score!,
+            'Results should be ordered by BM25 score (descending relevance)'
+          );
+        }
+      }
+
+      // Golden butterflyfish should rank first
+      if (results.length > 0) {
+        assert(
+          results[0].specCode === 3,
+          'Golden butterflyfish should rank first for "golden coloration butterfly"'
+        );
+      }
+    });
+
+    it('should handle queries with special characters', async () => {
+      // Should not throw SQL errors with special characters
+      await assert.doesNotReject(async () => {
+        const results = await searchService.searchFishByNaturalLanguage(
+          'fish & ocean @ #special',
+          10
+        );
+        assert(Array.isArray(results), 'Should return array');
+      });
+    });
+
+    it('should find fish with partial term matches above threshold', async () => {
+      // According to ADR, ~1/3 of terms matching should pass -10.0 threshold
+      const results = await searchService.searchFishByNaturalLanguage(
+        'large tropical oceanic waters',
+        10
+      );
+
+      // Tuna matches "large", "tropical", "oceanic" and "waters" (4/4 terms)
+      assert(
+        results.some(r => r.specCode === 1),
+        'Should find tuna with 4/4 term matches'
+      );
+
+      // Test partial match
+      const partialResults = await searchService.searchFishByNaturalLanguage(
+        'large arctic submarine predator',
+        10
+      );
+
+      // Tuna only matches "large" (1/4 terms), should be below threshold
+      assert(
+        !partialResults.some(r => r.specCode === 1),
+        'Should not find tuna with only 1/4 term matches'
+      );
+    });
+
+    it('should include BM25 score in results', async () => {
+      const results = await searchService.searchFishByNaturalLanguage(
+        'tropical ocean',
+        10
+      );
+
+      if (results.length > 0) {
+        assert('score' in results[0], 'Results should include BM25 score');
+        assert(
+          typeof results[0].score === 'number',
+          'BM25 score should be a number'
+        );
+        assert(
+          results[0].score! <= -10.0,
+          'BM25 score should be at or below threshold of -10.0'
+        );
+      }
+    });
+  });
 });
