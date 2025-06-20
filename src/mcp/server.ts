@@ -100,7 +100,8 @@ export class FishMCPServer {
             const results =
               await this.searchService.searchFishByNaturalLanguage(
                 query,
-                args?.limit as number | undefined
+                args?.limit as number | undefined,
+                args?.scoreThreshold as number | undefined
               );
 
             return {
