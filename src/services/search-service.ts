@@ -323,7 +323,7 @@ export class SearchService {
     const cleanedQuery = query.replace(/[&@#]/g, ' ');
 
     // FTS5を使用してcommentsフィールドを全文検索
-    // bm25()関数でスコアを取得（負の値ほど関連性が高い）
+    // bm25()関数でスコアを取得（小さい値ほど関連性が高い）
     const results = this.db
       .prepare(
         `
