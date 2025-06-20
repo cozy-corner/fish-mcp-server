@@ -488,7 +488,8 @@ describe('SearchService', () => {
       // Test query that should match tuna's comments
       const results = await searchService.searchFishByNaturalLanguage(
         'large oceanic fish tropical waters',
-        10
+        10,
+        -0.25
       );
 
       assert(
@@ -506,7 +507,8 @@ describe('SearchService', () => {
       // Query with partial relevance
       const results = await searchService.searchFishByNaturalLanguage(
         'small freshwater aquarium fish',
-        10
+        10,
+        -0.25
       );
 
       // Should find freshwater loach but not saltwater fish with low relevance
@@ -530,7 +532,8 @@ describe('SearchService', () => {
     it('should handle Japanese natural language queries', async () => {
       const results = await searchService.searchFishByNaturalLanguage(
         '熱帯の海にいる大きな魚',
-        10
+        10,
+        -0.25
       );
 
       // May or may not find results depending on whether Japanese is in comments
@@ -545,7 +548,8 @@ describe('SearchService', () => {
       // Query with very low relevance to any fish
       const results = await searchService.searchFishByNaturalLanguage(
         'computer software programming code',
-        10
+        10,
+        -0.25
       );
 
       assert.equal(
@@ -559,7 +563,8 @@ describe('SearchService', () => {
       // Test that multi-word queries work with BM25
       const results = await searchService.searchFishByNaturalLanguage(
         'Pacific Ocean pelagic fish common',
-        10
+        10,
+        -0.25
       );
 
       assert(
@@ -575,14 +580,19 @@ describe('SearchService', () => {
     it('should respect limit parameter', async () => {
       const results = await searchService.searchFishByNaturalLanguage(
         'fish ocean',
-        2
+        2,
+        -0.25
       );
 
       assert(results.length <= 2, 'Should respect limit parameter');
     });
 
     it('should handle empty query gracefully', async () => {
-      const results = await searchService.searchFishByNaturalLanguage('', 10);
+      const results = await searchService.searchFishByNaturalLanguage(
+        '',
+        10,
+        -0.25
+      );
 
       assert.equal(
         results.length,
@@ -594,7 +604,8 @@ describe('SearchService', () => {
     it('should handle single-word queries', async () => {
       const results = await searchService.searchFishByNaturalLanguage(
         'butterfly',
-        10
+        10,
+        -0.25
       );
 
       assert(results.length > 0, 'Should find results for single word query');
@@ -607,7 +618,8 @@ describe('SearchService', () => {
     it('should not include images in natural language search results', async () => {
       const results = await searchService.searchFishByNaturalLanguage(
         'tropical fish',
-        10
+        10,
+        -0.25
       );
 
       if (results.length > 0) {
@@ -621,7 +633,8 @@ describe('SearchService', () => {
     it('should rank results by BM25 score', async () => {
       const results = await searchService.searchFishByNaturalLanguage(
         'golden coloration butterfly',
-        10
+        10,
+        -0.25
       );
 
       if (results.length > 1) {
@@ -648,7 +661,8 @@ describe('SearchService', () => {
       await assert.doesNotReject(async () => {
         const results = await searchService.searchFishByNaturalLanguage(
           'fish & ocean @ #special',
-          10
+          10,
+          -0.25
         );
         assert(Array.isArray(results), 'Should return array');
       });
@@ -658,7 +672,8 @@ describe('SearchService', () => {
       // According to ADR, ~1/3 of terms matching should pass -10.0 threshold
       const results = await searchService.searchFishByNaturalLanguage(
         'large tropical oceanic waters',
-        10
+        10,
+        -0.25
       );
 
       // Tuna matches "large", "tropical", "oceanic" and "waters" (4/4 terms)
@@ -670,7 +685,8 @@ describe('SearchService', () => {
       // Test partial match
       const partialResults = await searchService.searchFishByNaturalLanguage(
         'large arctic submarine predator',
-        10
+        10,
+        -0.25
       );
 
       // Tuna only matches "large" (1/4 terms), should be below threshold
@@ -683,7 +699,8 @@ describe('SearchService', () => {
     it('should include BM25 score in results', async () => {
       const results = await searchService.searchFishByNaturalLanguage(
         'tropical ocean',
-        10
+        10,
+        -0.25
       );
 
       if (results.length > 0) {
