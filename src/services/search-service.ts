@@ -30,7 +30,11 @@ export interface SearchFeatures {
   includeImages?: boolean;
 }
 
-export type FishWithMatch = Fish & { matchType: string; matchedName?: string };
+export type FishWithMatch = Fish & {
+  matchType: string;
+  matchedName?: string;
+  score?: number;
+};
 
 /**
  * 検索クエリで受け付け可能な文字種
@@ -87,6 +91,7 @@ interface FishDbRow {
   comments?: string;
   match_type?: string;
   matched_name?: string;
+  score?: number;
 }
 
 interface CommonNameDbRow {
@@ -306,13 +311,19 @@ export class SearchService {
    */
   async searchFishByNaturalLanguage(
     query: string,
-    limit: number = 10
+    limit: number = 10,
+    scoreThreshold: number = -2.0
   ): Promise<FishWithMatch[]> {
-    // BM25スコアの閾値（負の値が高スコア）
-    const SCORE_THRESHOLD = -10.0;
+    // Handle empty query
+    if (!query || query.trim() === '') {
+      return [];
+    }
+
+    // Handle FTS5 special operators that can cause syntax errors
+    const cleanedQuery = query.replace(/[&@#]/g, ' ');
 
     // FTS5を使用してcommentsフィールドを全文検索
-    // bm25()関数でスコアを取得（負の値ほど関連性が高い）
+    // bm25()関数でスコアを取得（小さい値ほど関連性が高い）
     const results = this.db
       .prepare(
         `
@@ -323,12 +334,12 @@ export class SearchService {
       FROM fish f
       JOIN fish_search fs ON f.spec_code = fs.rowid
       WHERE fish_search MATCH ?
-        AND bm25(fish_search) > ?
+        AND bm25(fish_search) < ?
       ORDER BY bm25(fish_search)
       LIMIT ?
     `
       )
-      .all(query, SCORE_THRESHOLD, limit) as FishDbRow[];
+      .all(cleanedQuery, scoreThreshold, limit) as FishDbRow[];
 
     return this.transformDbRowsToFish(results);
   }
@@ -484,6 +495,7 @@ export class SearchService {
       comments: row.comments,
       matchType: row.match_type || 'unknown',
       matchedName: row.matched_name,
+      score: row.score,
     }));
   }
 }
