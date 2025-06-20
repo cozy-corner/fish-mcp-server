@@ -45,7 +45,7 @@ const SCORE_THRESHOLD = -2.0;
 ### 2. データ駆動による閾値選択
 
 **スコア分析結果**:
-```
+```text
 Query: "large oceanic fish tropical waters"
 - Score: -6.27 (最高関連性)
 - Score: -3.78 (中程度関連性)
@@ -115,7 +115,7 @@ scoreThreshold: {
 - ✅ パラメータ柔軟性の検証済み
 
 ### 品質向上効果
-```
+```text
 実際の検索例:
 Default (-2.0): Xiphias gladius, Regalecus glesne (2件)
 Test (-0.25):   同上 + 低関連性結果 (2件)
