@@ -88,6 +88,11 @@ export const searchFishByNaturalLanguageTool: Tool = {
         description: '検索結果の最大件数（デフォルト: 10）',
         default: 10,
       },
+      scoreThreshold: {
+        type: 'number',
+        description: 'BM25スコア閾値。より負の値が高関連性（デフォルト: -2.0）',
+        default: -2.0,
+      },
     },
     required: ['query'],
   },
