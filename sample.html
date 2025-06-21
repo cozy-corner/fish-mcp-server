@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クマノミの仲間 画像ギャラリー</title>
+    <style>
+        body {
+            font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+        
+        .fish-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .fish-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        
+        .fish-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 3px solid #f0f0f0;
+        }
+        
+        .fish-name-jp {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .fish-name-en {
+            font-size: 1.1em;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+        
+        .fish-scientific {
+            font-size: 0.95em;
+            color: #34495e;
+            font-style: italic;
+            margin-bottom: 12px;
+            padding: 5px 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+        }
+        
+        .fish-size {
+            font-size: 1em;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .copyright {
+            font-size: 0.8em;
+            color: #95a5a6;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        
+        .summary {
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .summary h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .summary p {
+            color: #34495e;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐠 クマノミの仲間 画像ギャラリー 🐠</h1>
+        
+        <div class="summary">
+            <h2>魚類検索MCPサーバー検索結果</h2>
+            <p>Amphiprion属のクマノミ14種類の画像集です。<br>
+            全て海水魚で、イソギンチャクとの共生関係で知られています。</p>
+        </div>
+        
+        <div class="gallery">
+            <!-- ハマクマノミ -->
+            <div class="fish-card">
+                <img src="https://static.inaturalist.org/photos/441595987/medium.jpeg" alt="ハマクマノミ" class="fish-image">
+                <div class="fish-name-jp">ハマクマノミ</div>
+                <div class="fish-name-en">Tomato clownfish</div>
+                <div class="fish-scientific">Amphiprion frenatus</div>
+                <div class="fish-size">最大サイズ: 14cm</div>
+                <div class="copyright">© Sinead Chen, all rights reserved</div>
+            </div>
+            
+            <!-- ハナビラクマノミ -->
+            <div class="fish-card">
+                <img src="https://inaturalist-open-data.s3.amazonaws.com/photos/459287391/medium.jpeg" alt="ハナビラクマノミ" class="fish-image">
+                <div class="fish-name-jp">ハナビラクマノミ</div>
+                <div class="fish-name-en">Pink anemonefish</div>
+                <div class="fish-scientific">Amphiprion perideraion</div>
+                <div class="fish-size">最大サイズ: 10cm</div>
+                <div class="copyright">© anthonyamar, some rights reserved (CC BY-NC)</div>
+            </div>
+            
+            <!-- カクレクマノミ -->
+            <div class="fish-card">
+                <img src="https://inaturalist-open-data.s3.amazonaws.com/photos/10288037/medium.jpeg" alt="カクレクマノミ" class="fish-image">
+                <div class="fish-name-jp">カクレクマノミ</div>
+                <div class="fish-name-en">Clown anemonefish</div>
+                <div class="fish-scientific">Amphiprion ocellaris</div>
+                <div class="fish-size">最大サイズ: 11cm</div>
+                <div class="copyright">© Francesco Ricciardi, some rights reserved (CC BY-NC)</div>
+            </div>
+            
+            <!-- クマノミ -->
+            <div class="fish-card">
+                <img src="https://inaturalist-open-data.s3.amazonaws.com/photos/205695517/medium.jpg" alt="クマノミ" class="fish-image">
+                <div class="fish-name-jp">クマノミ</div>
+                <div class="fish-name-en">Yellowtail clownfish</div>
+                <div class="fish-scientific">Amphiprion clarkii</div>
+                <div class="fish-size">最大サイズ: 15cm</div>
+                <div class="copyright">© Joe Rowlett, some rights reserved (CC BY-NC)</div>
+            </div>
+            
+            <!-- セジロクマノミ -->
+            <div class="fish-card">
+                <img src="https://inaturalist-open-data.s3.amazonaws.com/photos/168957846/medium.jpeg" alt="セジロクマノミ" class="fish-image">
+                <div class="fish-name-jp">セジロクマノミ</div>
+                <div class="fish-name-en">Yellow clownfish</div>
+                <div class="fish-scientific">Amphiprion sandaracinos</div>
+                <div class="fish-size">最大サイズ: 14cm</div>
+                <div class="copyright">© Benoît Segerer, some rights reserved (CC BY-NC)</div>
+            </div>
+            
+            <!-- トウアカクマノミ -->
+            <div class="fish-card">
+                <img src="https://inaturalist-open-data.s3.amazonaws.com/photos/429561263/medium.jpg" alt="トウアカクマノミ" class="fish-image">
+                <div class="fish-name-jp">トウアカクマノミ</div>
+                <div class="fish-name-en">Saddleback clownfish</div>
+                <div class="fish-scientific">Amphiprion polymnus</div>
+                <div class="fish-size">最大サイズ: 13cm</div>
+                <div class="copyright">© Xavier Rufray, some rights reserved (CC BY-NC)</div>
+            </div>
+            
+            <!-- セバエクマノミ -->
+            <div class="fish-card">
+                <img src="https://inaturalist-open-data.s3.amazonaws.com/photos/229868370/medium.jpeg" alt="セバエクマノミ" class="fish-image">
+                <div class="fish-name-jp">セバエクマノミ</div>
+                <div class="fish-name-en">Sebae anemonefish</div>
+                <div class="fish-scientific">Amphiprion sebae</div>
+                <div class="fish-size">最大サイズ: 16cm</div>
+                <div class="copyright">© Floyd E. Hayes, some rights reserved (CC BY-NC)</div>
+            </div>
+            
+            <!-- ツノダシクマノミ -->
+            <div class="fish-card">
+                <img src="https://static.inaturalist.org/photos/120118982/medium.jpg" alt="ツノダシクマノミ" class="fish-image">
+                <div class="fish-name-jp">ツノダシクマノミ</div>
+                <div class="fish-name-en">Spinecheek anemonefish</div>
+                <div class="fish-scientific">Amphiprion biaculeatus</div>
+                <div class="fish-size">最大サイズ: 17cm</div>
+                <div class="copyright">© Joe Tomoleoni, all rights reserved</div>
+            </div>
+            
+            <!-- オレンジクマノミ -->
+            <div class="fish-card">
+                <img src="https://static.inaturalist.org/photos/513815003/medium.jpg" alt="オレンジクマノミ" class="fish-image">
+                <div class="fish-name-jp">オレンジクマノミ</div>
+                <div class="fish-name-en">Orange clownfish</div>
+                <div class="fish-scientific">Amphiprion percula</div>
+                <div class="fish-size">最大サイズ: 11cm</div>
+                <div class="copyright">© Tahn Miller, all rights reserved</div>
+            </div>
+            
+            <!-- ファイアークラウン -->
+            <div class="fish-card">
+                <img src="https://static.inaturalist.org/photos/50588155/medium.jpg" alt="ファイアークラウン" class="fish-image">
+                <div class="fish-name-jp">ファイアークラウン</div>
+                <div class="fish-name-en">Fire clownfish</div>
+                <div class="fish-scientific">Amphiprion melanopus</div>
+                <div class="fish-size">最大サイズ: 12cm</div>
+                <div class="copyright">© Meghan C, all rights reserved</div>
+            </div>
+            
+            <!-- スカンククマノミ -->
+            <div class="fish-card">
+                <img src="https://inaturalist-open-data.s3.amazonaws.com/photos/63407217/medium.jpeg" alt="スカンククマノミ" class="fish-image">
+                <div class="fish-name-jp">スカンククマノミ</div>
+                <div class="fish-name-en">Skunk clownfish</div>
+                <div class="fish-scientific">Amphiprion akallopisos</div>
+                <div class="fish-size">最大サイズ: 11cm</div>
+                <div class="copyright">© Aurélien Bour, some rights reserved (CC BY-NC)</div>
+            </div>
+            
+            <!-- エフィピウムクマノミ -->
+            <div class="fish-card">
+                <img src="https://inaturalist-open-data.s3.amazonaws.com/photos/169398477/medium.jpeg" alt="エフィピウムクマノミ" class="fish-image">
+                <div class="fish-name-jp">エフィピウムクマノミ</div>
+                <div class="fish-name-en">Saddle anemonefish</div>
+                <div class="fish-scientific">Amphiprion ephippium</div>
+                <div class="fish-size">最大サイズ: 14cm</div>
+                <div class="copyright">© Rémi GP, some rights reserved (CC BY-NC)</div>
+            </div>
+            
+            <!-- マルーンクラウン -->
+            <div class="fish-card">
+                <img src="https://inaturalist-open-data.s3.amazonaws.com/photos/62818093/medium.jpg" alt="マルーンクラウン" class="fish-image">
+                <div class="fish-name-jp">マルーンクラウン</div>
+                <div class="fish-name-en">Maroon clownfish</div>
+                <div class="fish-scientific">Amphiprion tricinctus</div>
+                <div class="fish-size">最大サイズ: 12cm</div>
+                <div class="copyright">© bioislife, some rights reserved (CC BY-NC)</div>
+            </div>
+            
+            <!-- ツーバンドクマノミ -->
+            <div class="fish-card">
+                <img src="https://inaturalist-open-data.s3.amazonaws.com/photos/236456200/medium.jpg" alt="ツーバンドクマノミ" class="fish-image">
+                <div class="fish-name-jp">ツーバンドクマノミ</div>
+                <div class="fish-name-en">Twoband anemonefish</div>
+                <div class="fish-scientific">Amphiprion bicinctus</div>
+                <div class="fish-size">最大サイズ: 14cm</div>
+                <div class="copyright">© Rafi Amar, some rights reserved (CC BY-NC)</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
