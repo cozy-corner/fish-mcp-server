@@ -23,7 +23,9 @@ export default [
         fetch: 'readonly',
         process: 'readonly',
         URLSearchParams: 'readonly',
-        setTimeout: 'readonly'
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        AbortController: 'readonly'
       }
     },
     rules: {

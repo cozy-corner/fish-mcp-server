@@ -151,13 +151,39 @@ export class ImageService {
     imageUrl: string
   ): Promise<{ base64: string; mimeType: string } | null> {
     try {
-      const response = await fetch(imageUrl);
+      // タイムアウトとサイズ制限の追加
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒のタイムアウト
+
+      const response = await fetch(imageUrl, {
+        signal: controller.signal,
+        headers: { 'User-Agent': 'Fish-MCP-Server/1.0' },
+      });
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
         throw new Error(`Failed to fetch image: ${response.statusText}`);
       }
 
-      const contentType = response.headers.get('content-type') || 'image/jpeg';
+      // MIMEタイプの検証
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.startsWith('image/')) {
+        throw new Error(`Invalid content type: ${contentType}`);
+      }
+
+      // Content-Lengthヘッダーでサイズチェック
+      const contentLength = response.headers.get('content-length');
+      if (contentLength && parseInt(contentLength, 10) > 5 * 1024 * 1024) {
+        // 5MB制限
+        throw new Error('Image too large');
+      }
+
       const arrayBuffer = await response.arrayBuffer();
+      // ダウンロード後の実際のサイズを再確認
+      if (arrayBuffer.byteLength > 5 * 1024 * 1024) {
+        throw new Error('Image too large');
+      }
+
       const base64 = Buffer.from(arrayBuffer).toString('base64');
 
       return {
