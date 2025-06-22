@@ -250,8 +250,8 @@ export class SearchService {
         .all(query, limit) as FishDbRow[];
 
       if (results.length > 0) {
-        return includeImages
-          ? this.transformDbRowsToFishWithImages(results)
+        return includeImages || includeImagesAsBase64
+          ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
           : this.transformDbRowsToFish(results);
       }
     }
