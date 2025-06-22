@@ -93,12 +93,8 @@ describe('ImageService Base64 functionality', () => {
     );
   });
 
-  it('should still return URL even if Base64 encoding fails', async () => {
-    // This is tested implicitly in the implementation - if Base64 encoding fails,
-    // the image object should still have URL and attribution
-    // We can't easily simulate this failure in a unit test without mocking
-
-    // For now, just verify the behavior with a normal request
+  it('should return URL and attribution for valid fish requests', async () => {
+    // Verify that basic image properties are always present
     const images = await imageService.getImagesForFish(
       'Carcharodon carcharias',
       true
@@ -106,7 +102,6 @@ describe('ImageService Base64 functionality', () => {
 
     if (images.length > 0) {
       const image = images[0];
-      // URL should always be present regardless of Base64 success
       assert.ok(image.url, 'Image should always have a URL');
       assert.ok(image.attribution, 'Image should always have attribution');
     }
