@@ -28,6 +28,7 @@ export interface SearchFeatures {
   environment?: 'fresh' | 'brackish' | 'saltwater';
   gamefish?: boolean;
   includeImages?: boolean;
+  includeImagesAsBase64?: boolean;
 }
 
 export type FishWithMatch = Fish & {
@@ -164,7 +165,8 @@ export class SearchService {
   async searchFishByName(
     query: string,
     limit: number = 10,
-    includeImages: boolean = false
+    includeImages: boolean = false,
+    includeImagesAsBase64: boolean = false
   ): Promise<FishWithMatch[]> {
     // クエリの前処理
     const romajiQuery = this.toRomaji(query);
@@ -184,8 +186,8 @@ export class SearchService {
       .all(query, romajiQuery, limit) as FishDbRow[];
 
     if (results.length > 0) {
-      return includeImages
-        ? this.transformDbRowsToFishWithImages(results)
+      return includeImages || includeImagesAsBase64
+        ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
         : this.transformDbRowsToFish(results);
     }
 
@@ -206,8 +208,8 @@ export class SearchService {
       .all(`%${query}%`, `%${romajiQuery}%`, limit) as FishDbRow[];
 
     if (results.length > 0) {
-      return includeImages
-        ? this.transformDbRowsToFishWithImages(results)
+      return includeImages || includeImagesAsBase64
+        ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
         : this.transformDbRowsToFish(results);
     }
 
@@ -227,8 +229,8 @@ export class SearchService {
       .all(romajiQuery, limit) as FishDbRow[];
 
     if (results.length > 0) {
-      return includeImages
-        ? this.transformDbRowsToFishWithImages(results)
+      return includeImages || includeImagesAsBase64
+        ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
         : this.transformDbRowsToFish(results);
     }
 
@@ -248,8 +250,8 @@ export class SearchService {
         .all(query, limit) as FishDbRow[];
 
       if (results.length > 0) {
-        return includeImages
-          ? this.transformDbRowsToFishWithImages(results)
+        return includeImages || includeImagesAsBase64
+          ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
           : this.transformDbRowsToFish(results);
       }
     }
@@ -268,8 +270,8 @@ export class SearchService {
       )
       .all(`%${query}%`, limit) as FishDbRow[];
 
-    return includeImages
-      ? this.transformDbRowsToFishWithImages(results)
+    return includeImages || includeImagesAsBase64
+      ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
       : this.transformDbRowsToFish(results);
   }
 
@@ -400,8 +402,11 @@ export class SearchService {
       )
       .all(...params, limit) as FishDbRow[];
 
-    return features.includeImages
-      ? this.transformDbRowsToFishWithImages(results)
+    return features.includeImages || features.includeImagesAsBase64
+      ? this.transformDbRowsToFishWithImages(
+          results,
+          features.includeImagesAsBase64 || false
+        )
       : this.transformDbRowsToFish(results);
   }
 
@@ -433,7 +438,8 @@ export class SearchService {
   }
 
   private async transformDbRowsToFishWithImages(
-    rows: FishDbRow[]
+    rows: FishDbRow[],
+    includeBase64: boolean = false
   ): Promise<FishWithMatch[]> {
     const fishList = this.transformDbRowsToFish(rows);
 
@@ -442,7 +448,8 @@ export class SearchService {
       fishList.map(async fish => {
         try {
           const images = await this.imageService.getImagesForFish(
-            fish.scientificName
+            fish.scientificName,
+            includeBase64
           );
           return { ...fish, images };
         } catch (error) {

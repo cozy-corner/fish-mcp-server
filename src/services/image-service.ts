@@ -32,9 +32,13 @@ export class ImageService {
   /**
    * 魚の学名から画像を取得する（最初の1枚のみ）
    * @param scientificName 魚の学名
+   * @param includeBase64 Base64形式で画像を含めるかどうか
    * @returns 画像情報の配列、画像が見つからない場合は空配列
    */
-  async getImagesForFish(scientificName: string): Promise<FishImage[]> {
+  async getImagesForFish(
+    scientificName: string,
+    includeBase64: boolean = false
+  ): Promise<FishImage[]> {
     debug('Fetching images for scientific name: %s', scientificName);
 
     // Promise queueを使用して並行リクエストを直列化
@@ -55,13 +59,29 @@ export class ImageService {
         for (const observation of observations) {
           if (observation.photos && observation.photos.length > 0) {
             const photo = observation.photos[0];
-            debug('Found image for %s: %s', scientificName, photo.url);
-            return [
-              {
-                url: this.getHighQualityImageUrl(photo.url),
-                attribution: photo.attribution || '© Unknown',
-              },
-            ];
+            const imageUrl = this.getHighQualityImageUrl(photo.url);
+            debug('Found image for %s: %s', scientificName, imageUrl);
+
+            const fishImage: FishImage = {
+              url: imageUrl,
+              attribution: photo.attribution || '© Unknown',
+            };
+
+            // Base64エンコーディングが必要な場合
+            if (includeBase64) {
+              try {
+                const base64Data = await this.fetchAndEncodeImage(imageUrl);
+                if (base64Data) {
+                  fishImage.base64 = base64Data.base64;
+                  fishImage.mimeType = base64Data.mimeType;
+                }
+              } catch (error) {
+                debug('Failed to encode image to Base64: %O', error);
+                // Base64エンコーディングに失敗してもURLは返す
+              }
+            }
+
+            return [fishImage];
           }
         }
 
@@ -120,5 +140,59 @@ export class ImageService {
     await new Promise(resolve =>
       setTimeout(resolve, ImageService.RATE_LIMIT_DELAY_MS)
     );
+  }
+
+  /**
+   * 画像をフェッチしてBase64にエンコード
+   * @param imageUrl 画像のURL
+   * @returns Base64エンコードされた画像データとMIMEタイプ
+   */
+  private async fetchAndEncodeImage(
+    imageUrl: string
+  ): Promise<{ base64: string; mimeType: string } | null> {
+    try {
+      // タイムアウトとサイズ制限の追加
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒のタイムアウト
+
+      const response = await fetch(imageUrl, {
+        signal: controller.signal,
+        headers: { 'User-Agent': 'Fish-MCP-Server/1.0' },
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+
+      // MIMEタイプの検証
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.startsWith('image/')) {
+        throw new Error(`Invalid content type: ${contentType}`);
+      }
+
+      // Content-Lengthヘッダーでサイズチェック
+      const contentLength = response.headers.get('content-length');
+      if (contentLength && parseInt(contentLength, 10) > 5 * 1024 * 1024) {
+        // 5MB制限
+        throw new Error('Image too large');
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      // ダウンロード後の実際のサイズを再確認
+      if (arrayBuffer.byteLength > 5 * 1024 * 1024) {
+        throw new Error('Image too large');
+      }
+
+      const base64 = Buffer.from(arrayBuffer).toString('base64');
+
+      return {
+        base64: `data:${contentType};base64,${base64}`,
+        mimeType: contentType,
+      };
+    } catch (error) {
+      debug('Error fetching/encoding image from %s: %O', imageUrl, error);
+      return null;
+    }
   }
 }

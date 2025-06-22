@@ -21,6 +21,11 @@ export const searchFishByNameTool: Tool = {
         description: '画像情報を含めるかどうか（デフォルト: false）',
         default: false,
       },
+      includeImagesAsBase64: {
+        type: 'boolean',
+        description: 'Base64形式で画像を含める（デフォルト: false）',
+        default: false,
+      },
     },
     required: ['query'],
   },
@@ -64,6 +69,11 @@ export const searchFishByFeaturesTool: Tool = {
       includeImages: {
         type: 'boolean',
         description: '画像情報を含めるかどうか（デフォルト: false）',
+        default: false,
+      },
+      includeImagesAsBase64: {
+        type: 'boolean',
+        description: 'Base64形式で画像を含める（デフォルト: false）',
         default: false,
       },
     },
