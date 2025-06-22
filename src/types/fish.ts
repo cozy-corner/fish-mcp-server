@@ -103,6 +103,8 @@ export enum ElectricAbility {
 export interface FishImage {
   url: string; // 画像URL
   attribution: string; // 著作権表示
+  base64?: string; // Base64エンコードされた画像データ
+  mimeType?: string; // 画像のMIMEタイプ
 }
 
 export interface Fish {

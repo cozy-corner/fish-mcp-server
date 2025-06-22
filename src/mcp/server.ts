@@ -63,7 +63,8 @@ export class FishMCPServer {
             const results = await this.searchService.searchFishByName(
               query,
               args?.limit as number | undefined,
-              args?.includeImages as boolean | undefined
+              args?.includeImages as boolean | undefined,
+              args?.includeImagesAsBase64 as boolean | undefined
             );
 
             return {
@@ -147,7 +148,9 @@ export class FishMCPServer {
         const danger = this.getDangerDescription(fish.dangerous);
         const image =
           fish.images && fish.images.length > 0
-            ? `\n   画像: ${fish.images[0].url}\n   画像提供: ${fish.images[0].attribution}`
+            ? fish.images[0].base64
+              ? `\n   ${fish.images[0].base64}\n   画像提供: ${fish.images[0].attribution}`
+              : `\n   画像: ${fish.images[0].url}\n   画像提供: ${fish.images[0].attribution}`
             : '';
         const comments = fish.comments ? `\n   ${fish.comments}` : '';
 
