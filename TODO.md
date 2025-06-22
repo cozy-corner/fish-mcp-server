@@ -131,15 +131,16 @@ Claude DesktopでURLリンクの画像が表示できない問題を解決する
 - `includeImagesAsBase64`フラグを追加
 - LRUキャッシュ戦略: メモリ上限100MB、50画像、TTL 1時間
 
-### PR #1: Base64画像サポートの基盤実装
-- [ ] `FishImage`型にbase64とmimeTypeフィールド追加
-- [ ] MCPツール（3つ全て）にincludeImagesAsBase64パラメータ追加
-- [ ] `ImageService`にBase64変換機能追加（キャッシュなし版）
-  - [ ] `fetchAndEncodeImage`メソッド実装
-  - [ ] タイムアウト設定（5秒）
-  - [ ] エラー時はURLのみ返す処理
-- [ ] `SearchService`で新パラメータ処理
-- [ ] 手動テストで動作確認
+### PR #1: Base64画像サポートの基盤実装 ✅
+- [x] `FishImage`型にbase64とmimeTypeフィールド追加
+- [x] MCPツール（3つ全て）にincludeImagesAsBase64パラメータ追加
+- [x] `ImageService`にBase64変換機能追加（キャッシュなし版）
+  - [x] `fetchAndEncodeImage`メソッド実装
+  - [x] タイムアウト設定（10秒）
+  - [x] エラー時はURLのみ返す処理
+  - [x] セキュリティ・性能ガードレール追加
+- [x] `SearchService`で新パラメータ処理
+- [x] 手動テストで動作確認
 
 ### PR #2: LRUキャッシュの実装
 - [ ] `src/utils/lru-cache.ts`に汎用LRUキャッシュクラス作成
