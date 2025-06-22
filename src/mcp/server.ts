@@ -149,7 +149,7 @@ export class FishMCPServer {
         const image =
           fish.images && fish.images.length > 0
             ? fish.images[0].base64
-              ? `\n   画像: ${fish.images[0].base64}\n   画像提供: ${fish.images[0].attribution}`
+              ? `\n   ${fish.images[0].base64}\n   画像提供: ${fish.images[0].attribution}`
               : `\n   画像: ${fish.images[0].url}\n   画像提供: ${fish.images[0].attribution}`
             : '';
         const comments = fish.comments ? `\n   ${fish.comments}` : '';
