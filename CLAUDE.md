@@ -237,25 +237,27 @@ This rule is enforced to maintain JSON-RPC protocol compatibility with Claude De
 
 ## ⚠️ CRITICAL: Git Branch Management Rules
 
-### Single Branch Per Feature Policy
-**NEVER create multiple branches for a single feature or PR**
+### Branch Creation Policy
+**NEVER create branches without explicit user instruction**
 
-**❌ FORBIDDEN - Multiple branches for one feature**:
+**❌ FORBIDDEN - Creating branches autonomously**:
 ```bash
-git checkout -b feat/add-documentation     # First branch
-# ... work on docs ...
-git checkout main
-git checkout -b feat/add-implementation    # Second branch for same feature
+git checkout -b feat/new-feature    # DON'T create branches automatically
 ```
 
-**✅ CORRECT - One branch per complete feature**:
+**✅ CORRECT - Ask user before creating branches**:
 ```bash
-git checkout -b feat/implement-complete-feature
-# Add all related changes in sequence:
-# 1. Documentation, 2. Dependencies, 3. Implementation, 4. Tests, 5. Updates
+# 1. Ask user: "Should I create a new branch for this feature?"
+# 2. Wait for explicit approval
+# 3. Only then create branch with user-provided name
 ```
 
-**Why**: Multiple branches cause lost changes, merge conflicts, and incomplete PRs.
+**If branch creation is needed**:
+- **ASK FIRST**: "Ready to create a branch? What should it be named?"
+- **WAIT for approval** before executing git commands
+- **Use the exact name** provided by user
+
+**Why**: Autonomous branch creation leads to scattered work, lost changes, and workflow confusion.
 
 ### Git Stash Safety Rules
 **Always verify stash contents before applying**
