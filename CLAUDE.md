@@ -234,3 +234,43 @@ try {
 - Any TypeScript file in the src/ directory
 
 This rule is enforced to maintain JSON-RPC protocol compatibility with Claude Desktop.
+
+## ⚠️ CRITICAL: Git Branch Management Rules
+
+### Single Branch Per Feature Policy
+**NEVER create multiple branches for a single feature or PR**
+
+**❌ FORBIDDEN - Multiple branches for one feature**:
+```bash
+git checkout -b feat/add-documentation     # First branch
+# ... work on docs ...
+git checkout main
+git checkout -b feat/add-implementation    # Second branch for same feature
+```
+
+**✅ CORRECT - One branch per complete feature**:
+```bash
+git checkout -b feat/implement-complete-feature
+# Add all related changes in sequence:
+# 1. Documentation, 2. Dependencies, 3. Implementation, 4. Tests, 5. Updates
+```
+
+**Why**: Multiple branches cause lost changes, merge conflicts, and incomplete PRs.
+
+### Git Stash Safety Rules
+**Always verify stash contents before applying**
+
+**❌ DANGEROUS - Blind stash operations**:
+```bash
+git stash pop    # DON'T pop without checking contents
+```
+
+**✅ SAFE - Verify before applying**:
+```bash
+git stash list                    # Check what stashes exist
+git stash show stash@{0}          # See which files are affected
+git stash show stash@{0} --stat   # See change summary
+# Only then decide if you want to apply it
+```
+
+**Why**: Stash may contain unrelated changes from lint-staged or other operations, causing unexpected conflicts.
