@@ -1,6 +1,7 @@
 // Using Node.js built-in fetch API (Node 18+)
 import type { FishImage } from '../types/fish.js';
 import createDebug from 'debug';
+import sharp from 'sharp';
 
 const debug = createDebug('fish-mcp:image-service');
 
@@ -23,10 +24,19 @@ interface INaturalistResponse {
   total_results: number;
 }
 
+interface ImageResizeOptions {
+  maxWidth?: number;
+  maxHeight?: number;
+  quality?: number;
+}
+
 export class ImageService {
   private static readonly INATURALIST_API_BASE =
     'https://api.inaturalist.org/v1';
   private static readonly RATE_LIMIT_DELAY_MS = 1000; // 1 request per second
+  private static readonly DEFAULT_MAX_WIDTH = 320;
+  private static readonly DEFAULT_MAX_HEIGHT = 240;
+  private static readonly DEFAULT_JPEG_QUALITY = 60;
   private requestQueue: Promise<unknown> = Promise.resolve();
 
   /**
@@ -145,10 +155,12 @@ export class ImageService {
   /**
    * 画像をフェッチしてBase64にエンコード
    * @param imageUrl 画像のURL
+   * @param resizeOptions オプショナルなリサイズ設定
    * @returns Base64エンコードされた画像データとMIMEタイプ
    */
   private async fetchAndEncodeImage(
-    imageUrl: string
+    imageUrl: string,
+    resizeOptions?: ImageResizeOptions
   ): Promise<{ base64: string; mimeType: string } | null> {
     try {
       // タイムアウトとサイズ制限の追加
@@ -184,15 +196,62 @@ export class ImageService {
         throw new Error('Image too large');
       }
 
-      const base64 = Buffer.from(arrayBuffer).toString('base64');
+      // 画像のリサイズ処理
+      const buffer = Buffer.from(arrayBuffer);
+      const resizedBuffer = await this.resizeImage(buffer, resizeOptions);
+
+      const base64 = resizedBuffer.toString('base64');
 
       return {
-        base64: `data:${contentType};base64,${base64}`,
-        mimeType: contentType,
+        base64: `data:image/jpeg;base64,${base64}`,
+        mimeType: 'image/jpeg',
       };
     } catch (error) {
       debug('Error fetching/encoding image from %s: %O', imageUrl, error);
       return null;
+    }
+  }
+
+  /**
+   * 画像をリサイズする
+   * @param inputBuffer 入力画像のバッファ
+   * @param options リサイズオプション
+   * @returns リサイズされた画像のバッファ
+   */
+  private async resizeImage(
+    inputBuffer: Buffer,
+    options?: ImageResizeOptions
+  ): Promise<Buffer> {
+    const maxWidth = options?.maxWidth ?? ImageService.DEFAULT_MAX_WIDTH;
+    const maxHeight = options?.maxHeight ?? ImageService.DEFAULT_MAX_HEIGHT;
+    const quality = options?.quality ?? ImageService.DEFAULT_JPEG_QUALITY;
+
+    try {
+      const resizedBuffer = await sharp(inputBuffer)
+        .resize(maxWidth, maxHeight, {
+          fit: 'inside',
+          withoutEnlargement: true,
+        })
+        .jpeg({
+          quality,
+          progressive: false,
+          mozjpeg: true,
+        })
+        .toBuffer();
+
+      debug(
+        'Image resized: %dx%d, quality: %d%, size: %d bytes',
+        maxWidth,
+        maxHeight,
+        quality,
+        resizedBuffer.length
+      );
+
+      return resizedBuffer;
+    } catch (error) {
+      debug('Error resizing image: %O', error);
+      // リサイズに失敗した場合は、JPEGに変換だけ行う
+      return sharp(inputBuffer).jpeg({ quality }).toBuffer();
     }
   }
 }

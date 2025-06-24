@@ -234,3 +234,45 @@ try {
 - Any TypeScript file in the src/ directory
 
 This rule is enforced to maintain JSON-RPC protocol compatibility with Claude Desktop.
+
+## ⚠️ CRITICAL: Git Branch Management Rules
+
+### Branch Creation Policy
+**NEVER create branches without explicit user instruction**
+
+**❌ FORBIDDEN - Creating branches autonomously**:
+```bash
+git checkout -b feat/new-feature    # DON'T create branches automatically
+```
+
+**✅ CORRECT - Ask user before creating branches**:
+```bash
+# 1. Ask user: "Should I create a new branch for this feature?"
+# 2. Wait for explicit approval
+# 3. Only then create branch with user-provided name
+```
+
+**If branch creation is needed**:
+- **ASK FIRST**: "Ready to create a branch? What should it be named?"
+- **WAIT for approval** before executing git commands
+- **Use the exact name** provided by user
+
+**Why**: Autonomous branch creation leads to scattered work, lost changes, and workflow confusion.
+
+### Git Stash Safety Rules
+**Always verify stash contents before applying**
+
+**❌ DANGEROUS - Blind stash operations**:
+```bash
+git stash pop    # DON'T pop without checking contents
+```
+
+**✅ SAFE - Verify before applying**:
+```bash
+git stash list                    # Check what stashes exist
+git stash show stash@{0}          # See which files are affected
+git stash show stash@{0} --stat   # See change summary
+# Only then decide if you want to apply it
+```
+
+**Why**: Stash may contain unrelated changes from lint-staged or other operations, causing unexpected conflicts.
