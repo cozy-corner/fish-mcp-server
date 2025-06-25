@@ -21,7 +21,7 @@ describe('SearchService Base64 functionality', () => {
     db.close();
   });
 
-  it('should include Base64 images when includeImagesAsBase64 is true', async () => {
+  it('should include Base64 images when includeImageContent is true', async () => {
     const results = await searchService.searchFishByName(
       'tuna',
       3,
@@ -39,11 +39,11 @@ describe('SearchService Base64 functionality', () => {
       // Check that Base64 data is included
       assert.ok(
         image.base64,
-        'Image should have Base64 data when includeImagesAsBase64 is true'
+        'Image should have Base64 data when includeImageContent is true'
       );
       assert.ok(
-        image.base64.startsWith('data:'),
-        'Base64 data should be a data URL'
+        !image.base64.startsWith('data:'),
+        'Base64 data should not include data: prefix'
       );
       assert.ok(image.mimeType, 'Image should have MIME type');
 
@@ -71,12 +71,12 @@ describe('SearchService Base64 functionality', () => {
       assert.equal(
         image.base64,
         undefined,
-        'Image should not have Base64 data when includeImagesAsBase64 is false'
+        'Image should not have Base64 data when includeImageContent is false'
       );
       assert.equal(
         image.mimeType,
         undefined,
-        'Image should not have MIME type when includeImagesAsBase64 is false'
+        'Image should not have MIME type when includeImageContent is false'
       );
 
       // URL should be present
@@ -132,7 +132,7 @@ describe('SearchService Base64 functionality', () => {
         minLength: 50,
         maxLength: 100,
         includeImages: false,
-        includeImagesAsBase64: true,
+        includeImageContent: true,
       },
       3
     );
@@ -147,7 +147,7 @@ describe('SearchService Base64 functionality', () => {
       // Check that Base64 data is included
       assert.ok(
         image.base64,
-        'Image should have Base64 data when includeImagesAsBase64 is true'
+        'Image should have Base64 data when includeImageContent is true'
       );
       assert.ok(image.url, 'Image should still have URL');
     }
