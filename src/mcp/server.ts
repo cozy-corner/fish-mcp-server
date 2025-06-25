@@ -64,17 +64,10 @@ export class FishMCPServer {
               query,
               args?.limit as number | undefined,
               args?.includeImages as boolean | undefined,
-              args?.includeImagesAsBase64 as boolean | undefined
+              args?.includeImageContent as boolean | undefined
             );
 
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: this.formatSearchResults(results, query),
-                },
-              ],
-            };
+            return this.formatSearchResults(results, query);
           }
 
           case 'search_fish_by_features': {
@@ -134,34 +127,81 @@ export class FishMCPServer {
     });
   }
 
-  private formatSearchResults(results: Fish[], query: string): string {
+  private formatSearchResults(
+    results: Fish[],
+    query: string
+  ): {
+    content: Array<{
+      type: string;
+      text?: string;
+      data?: string;
+      mimeType?: string;
+    }>;
+  } {
     if (results.length === 0) {
-      return `「${query}」に一致する魚は見つかりませんでした。`;
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `「${query}」に一致する魚は見つかりませんでした。`,
+          },
+        ],
+      };
     }
 
-    const formattedResults = results
-      .map((fish, index) => {
-        const extendedFish = fish as Fish & { matchedName?: string };
-        const names = extendedFish.matchedName || fish.fbName || '名称不明';
-        const size = fish.length ? `${fish.length}cm` : '不明';
-        const habitat = this.getHabitatDescription(fish);
-        const danger = this.getDangerDescription(fish.dangerous);
-        const image =
-          fish.images && fish.images.length > 0
-            ? fish.images[0].base64
-              ? `\n   ${fish.images[0].base64}\n   画像提供: ${fish.images[0].attribution}`
-              : `\n   画像: ${fish.images[0].url}\n   画像提供: ${fish.images[0].attribution}`
-            : '';
-        const comments = fish.comments ? `\n   ${fish.comments}` : '';
+    const content: Array<{
+      type: string;
+      text?: string;
+      data?: string;
+      mimeType?: string;
+    }> = [];
 
-        return `${index + 1}. ${names}（${fish.scientificName}）
+    // Add header
+    content.push({
+      type: 'text',
+      text: `「${query}」の検索結果（${results.length}件）:`,
+    });
+
+    results.forEach((fish, index) => {
+      const extendedFish = fish as Fish & { matchedName?: string };
+      const names = extendedFish.matchedName || fish.fbName || '名称不明';
+      const size = fish.length ? `${fish.length}cm` : '不明';
+      const habitat = this.getHabitatDescription(fish);
+      const danger = this.getDangerDescription(fish.dangerous);
+      const comments = fish.comments ? `\n   ${fish.comments}` : '';
+
+      // Add fish information as text
+      content.push({
+        type: 'text',
+        text: `\n${index + 1}. ${names}（${fish.scientificName}）
    大きさ: ${size}
    生息地: ${habitat}
-   危険度: ${danger}${image}${comments}`;
-      })
-      .join('\n\n');
+   危険度: ${danger}${comments}`,
+      });
 
-    return `「${query}」の検索結果（${results.length}件）:\n\n${formattedResults}`;
+      // Add image as separate ImageContent if available
+      if (fish.images && fish.images.length > 0) {
+        if (fish.images[0].base64) {
+          content.push({
+            type: 'text',
+            text: `   画像提供: ${fish.images[0].attribution}`,
+          });
+
+          content.push({
+            type: 'image',
+            data: fish.images[0].base64,
+            mimeType: fish.images[0].mimeType || 'image/jpeg',
+          });
+        } else {
+          content.push({
+            type: 'text',
+            text: `   画像: ${fish.images[0].url}\n   画像提供: ${fish.images[0].attribution}`,
+          });
+        }
+      }
+    });
+
+    return { content };
   }
 
   private formatFeatureSearchResults(
