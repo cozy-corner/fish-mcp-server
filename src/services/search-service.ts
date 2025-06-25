@@ -28,7 +28,7 @@ export interface SearchFeatures {
   environment?: 'fresh' | 'brackish' | 'saltwater';
   gamefish?: boolean;
   includeImages?: boolean;
-  includeImagesAsBase64?: boolean;
+  includeImageContent?: boolean;
 }
 
 export type FishWithMatch = Fish & {
@@ -166,7 +166,7 @@ export class SearchService {
     query: string,
     limit: number = 10,
     includeImages: boolean = false,
-    includeImagesAsBase64: boolean = false
+    includeImageContent: boolean = false
   ): Promise<FishWithMatch[]> {
     // クエリの前処理
     const romajiQuery = this.toRomaji(query);
@@ -186,8 +186,8 @@ export class SearchService {
       .all(query, romajiQuery, limit) as FishDbRow[];
 
     if (results.length > 0) {
-      return includeImages || includeImagesAsBase64
-        ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
+      return includeImages || includeImageContent
+        ? this.transformDbRowsToFishWithImages(results, includeImageContent)
         : this.transformDbRowsToFish(results);
     }
 
@@ -208,8 +208,8 @@ export class SearchService {
       .all(`%${query}%`, `%${romajiQuery}%`, limit) as FishDbRow[];
 
     if (results.length > 0) {
-      return includeImages || includeImagesAsBase64
-        ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
+      return includeImages || includeImageContent
+        ? this.transformDbRowsToFishWithImages(results, includeImageContent)
         : this.transformDbRowsToFish(results);
     }
 
@@ -229,8 +229,8 @@ export class SearchService {
       .all(romajiQuery, limit) as FishDbRow[];
 
     if (results.length > 0) {
-      return includeImages || includeImagesAsBase64
-        ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
+      return includeImages || includeImageContent
+        ? this.transformDbRowsToFishWithImages(results, includeImageContent)
         : this.transformDbRowsToFish(results);
     }
 
@@ -250,8 +250,8 @@ export class SearchService {
         .all(query, limit) as FishDbRow[];
 
       if (results.length > 0) {
-        return includeImages || includeImagesAsBase64
-          ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
+        return includeImages || includeImageContent
+          ? this.transformDbRowsToFishWithImages(results, includeImageContent)
           : this.transformDbRowsToFish(results);
       }
     }
@@ -270,8 +270,8 @@ export class SearchService {
       )
       .all(`%${query}%`, limit) as FishDbRow[];
 
-    return includeImages || includeImagesAsBase64
-      ? this.transformDbRowsToFishWithImages(results, includeImagesAsBase64)
+    return includeImages || includeImageContent
+      ? this.transformDbRowsToFishWithImages(results, includeImageContent)
       : this.transformDbRowsToFish(results);
   }
 
@@ -402,10 +402,10 @@ export class SearchService {
       )
       .all(...params, limit) as FishDbRow[];
 
-    return features.includeImages || features.includeImagesAsBase64
+    return features.includeImages || features.includeImageContent
       ? this.transformDbRowsToFishWithImages(
           results,
-          features.includeImagesAsBase64 || false
+          features.includeImageContent || false
         )
       : this.transformDbRowsToFish(results);
   }
@@ -439,7 +439,7 @@ export class SearchService {
 
   private async transformDbRowsToFishWithImages(
     rows: FishDbRow[],
-    includeBase64: boolean = false
+    includeImageContent: boolean = false
   ): Promise<FishWithMatch[]> {
     const fishList = this.transformDbRowsToFish(rows);
 
@@ -449,7 +449,7 @@ export class SearchService {
         try {
           const images = await this.imageService.getImagesForFish(
             fish.scientificName,
-            includeBase64
+            includeImageContent
           );
           return { ...fish, images };
         } catch (error) {
