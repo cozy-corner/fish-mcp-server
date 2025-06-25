@@ -33,12 +33,12 @@ describe('ImageService Base64 functionality', () => {
         'Image should have Base64 data when includeBase64 is true'
       );
       assert.ok(
-        image.base64.startsWith('data:'),
-        'Base64 data should start with data:'
+        !image.base64.startsWith('data:'),
+        'Base64 data should not include data: prefix'
       );
       assert.ok(
-        image.base64.includes(';base64,'),
-        'Base64 data should include ;base64,'
+        !image.base64.includes(';base64,'),
+        'Base64 data should not include ;base64, prefix'
       );
 
       // Check MIME type

@@ -198,12 +198,14 @@ export class ImageService {
 
       // 画像のリサイズ処理
       const buffer = Buffer.from(arrayBuffer);
+      debug('Original image size: %d bytes', buffer.length);
       const resizedBuffer = await this.resizeImage(buffer, resizeOptions);
+      debug('Resized image size: %d bytes', resizedBuffer.length);
 
       const base64 = resizedBuffer.toString('base64');
 
       return {
-        base64: `data:image/jpeg;base64,${base64}`,
+        base64: base64,
         mimeType: 'image/jpeg',
       };
     } catch (error) {
